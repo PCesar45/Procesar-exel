@@ -33,7 +33,11 @@ public class Abrir {
                 //while (entrada.hasNext()) {
                 //    System.out.println(entrada.nextLine());
                 //}
+                
                 fileChooser.setVisible(false);
+                Excel ex=new Excel();
+                System.out.println(f.getName());
+                ex.Importar(f);
                 Guardar guardaArch=new Guardar();
                 
             } catch (FileNotFoundException e) {
