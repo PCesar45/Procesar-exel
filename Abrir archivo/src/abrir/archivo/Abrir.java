@@ -35,10 +35,10 @@ public class Abrir {
                 //}
                 
                 fileChooser.setVisible(false);
-                Excel ex=new Excel();
-                System.out.println(f.getName());
-                ex.Importar(f);
-                Guardar guardaArch=new Guardar();
+                
+                ProcesandoArchivo Cargando = new ProcesandoArchivo(f);
+                Cargando.getArchSelect().setText(f.getName());
+                Cargando.setVisible(true);
                 
             } catch (FileNotFoundException e) {
                 System.out.println(e.getMessage());

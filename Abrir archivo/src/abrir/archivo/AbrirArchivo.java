@@ -28,8 +28,17 @@ public class AbrirArchivo {
         } catch(Exception e){
             System.out.println(e);
         }
+        //System.out.println("DOCINADE".equals("DOCINADE".toUpperCase()));
+        //System.out.println("DOCINADE".matches("[A-Z]"));
+        //System.out.println("Ó.A.".matches("[Á-Ú].*"));
+         //System.out.println("J.C".matches("(.*)[.]"));
+        // int pA="Centre for Computational Intelligence (CCI)".indexOf("(");
+         //int pC="Centre for Computational Intelligence (CCI)".indexOf(")");
+         //System.out.println(pA);
+         //System.out.println("Centre for Computational Intelligence (CCI)".substring(pA+1, pC));
         //Ventana de abrir el exel
         Abrir abrir = new Abrir();
+        
         
     }
 }

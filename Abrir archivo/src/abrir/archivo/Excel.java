@@ -39,6 +39,11 @@ public class Excel {
     private String Titulo;
     //la de AuthorsWithAff hay que dividirla en mas partes
     private String AuthorsWithAff;
+    private String Autor;
+    private String Escuela;
+    private String Campus;
+    private String Universidad;
+    private String Pais;
     //Va a guardar la informacion de Authors with affiliations separada por comas
     private String[] AuthorsWithAffDiv;
     int cantidadAuTec;
@@ -99,11 +104,12 @@ public class Excel {
                             if(IndiceColumna==columnaCodigo){
                                 
                                Codigo=celda.getStringCellValue();
-                               System.out.println(Codigo);
+                               //System.out.println(Codigo);
                             }
                             //Saca el titulo y lo guarda temporalmente
                             if(IndiceColumna==columnaTitulo){
                                Titulo=celda.getStringCellValue();
+                              // System.out.println(Titulo);
                             }
                             //Saca toda la informacion de Authors with affiliations y la guarda en una variable para posteriomente procesarla
                             if(IndiceColumna==columnaAuthorsWithAff){
@@ -111,18 +117,78 @@ public class Excel {
                                 AuthorsWithAff=celda.getStringCellValue();
                                 
                                 //Aqui se va a analizar y separar la columan de Authors with affiliations
-                                //primero voy a separar la informacion por las comas
-                                AuthorsWithAffDiv=AuthorsWithAff.split(", ");
-                                for (String AuthorsWithAffDivInfo : AuthorsWithAffDiv) {
-                                    //System.out.println(AuthorsWithAffDivInfo);
-                                    //Primero se conoce la U para saber si es un autor externo o del TEC
-                                    if(AnalisisUTec(AuthorsWithAffDivInfo)){
-                                        System.out.println(AuthorsWithAffDivInfo);
-                                        cantidadAuTec++;
-                                       
+                                //primero voy a remplazar los ; por , para procesar toda la informacion por igual (revisar)
+                                String[] AuthorsWithAffDiv1 = AuthorsWithAff.split("; ");
+                                
+                                for (int i = 0; i < AuthorsWithAffDiv1.length; i++) {
+                                   // voy a separar la informacion por las comas
+                                    String[] AuthorsWithAffDiv2 = AuthorsWithAffDiv1[i].split(", ");
+
+                                    for (int j = 0; j < AuthorsWithAffDiv2.length; j++) {
+                                        String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
+                                        
+                                        
+
+                                        //Se identifica si la informacion se trata del TEC 
+                                        if(AnalisisUTec(AuthorsWithAffDivInfo)){
+                                            //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
+                                            if(!"No encontrado".equals(AnalisisAutor(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
+                                                Autor=AnalisisAutor(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
+                                            }else{//en caso de que no lo encuentre lo busca en toda la linea 
+                                                if(!"No encontrado".equals(buscaAutor(AuthorsWithAffDiv2))){
+                                                    Autor=buscaAutor(AuthorsWithAffDiv2);
+                                                }
+                                                else{
+                                                   // si del todo no lo encuentra  lo mandaria a excepciones 
+                                                   // System.out.println("Este no lo encuentra");
+                                                    //System.out.println(AuthorsWithAffDiv1[i]);
+                                                }
+                                            }
+                                            //Escuela
+                                            String resultadoEscuela=buscaEscuela(AuthorsWithAffDiv2);
+                                            if(!"No encontrado".equals(resultadoEscuela)){
+                                                Escuela=resultadoEscuela;
+                                               // System.out.println(Escuela);
+                                            }
+                                            else{
+                                                 //System.out.println("Este no lo encuentra Escuela");
+                                                 //System.out.println(Codigo);
+                                                 //System.out.println(AuthorsWithAffDiv1[i]);
+                                                //Estos a excepciones 
+                                            }
+                                            //Campus
+                                            String resultadoCampus=buscaCampus(AuthorsWithAffDiv2);
+                                            if(!"No encontrado".equals(resultadoCampus)){
+                                                Campus=resultadoCampus;
+                                               // System.out.println(Escuela);
+                                            }
+                                            else{
+                                                 //System.out.println("Este no lo encuentra Escuela");
+                                                 //System.out.println(Codigo);
+                                                 //System.out.println(AuthorsWithAffDiv1[i]);
+                                                //Estos a excepciones 
+                                            }
+                                            //Universidad y Pais autores TEC son fijos
+                                            Universidad="Instituto Tecnologico de Costa Rica";
+                                            Pais="Costa Rica";
+
+                                           // System.out.println(Autor);
+                                            
+                                            //TEC:System.out.println(AuthorsWithAffDivInfo);
+                                            //System.out.println(AuthorsWithAffDiv1[i]);
+                                            //cantidadAuTec++;
+                                            
+                                            
+                                            //Imprimir todos los datos hasta ahora 
+                                            System.out.println(Codigo +" | "+Titulo+" | "+Autor+" | "+Escuela+" | "+Campus+" | "+Universidad+" | "+Pais);
+                                        }   
                                     }
                                     
                                 }
+                                
+                                    
+                                    
+                                
                             }
                             
                             
@@ -131,9 +197,9 @@ public class Excel {
                     }
                     
                 }
-               // if(IndiceFila==1){
-                  // break; 
-                //}
+//                if(IndiceFila==1){
+//                   break; 
+//                }
                
                // if(IndiceFila!=0)modelo.addRow(ListaColumna);
             }
@@ -145,6 +211,38 @@ public class Excel {
         
         return mensaje;
     }
+     String buscaAutor( String[] InfoFila){
+         String autor;
+         //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
+         //System.out.println(InfoFila[i]);
+         for (int i = 0; i < InfoFila.length; i++) {
+            //Las iniciales siempre estan en mayuscula y Las iniciales terminan con un punto
+            if((InfoFila[i].matches("[A-Z].*")||(InfoFila[i].matches("[Á-Ú].*")))&&((InfoFila[i].matches("(.*)[.]")))){
+              //  System.out.println("ENTRAAAAA");
+                 //retornamos el nombre con la(s) iniciale(s)
+                 //Antes de la inicial esta el nombre por eso i-1
+                 autor=InfoFila[i-1]+" ".concat(InfoFila[i]);
+                 return autor;
+            }   
+         }
+        
+        return "No encontrado";
+    }
+    String AnalisisAutor( String Autor,String Iniciales){
+         String autor;
+         //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
+         //System.out.println(InfoFila[i]);
+        //Las iniciales siempre estan en mayuscula y Las iniciales terminan con un punto
+        if((Iniciales.matches("[A-Z].*")||(Iniciales.matches("[Á-Ú].*")))&&((Iniciales.matches("(.*)[.]")))){
+          //  System.out.println("ENTRAAAAA");
+             //retornamos el nombre con la(s) iniciale(s)
+             autor=Autor+" ".concat(Iniciales);
+             return autor;
+        }
+       
+        
+        return "No encontrado";
+    } 
     boolean AnalisisUTec(String Info){
       //Convierte toda la info en minusculas 
       Info=Info.toLowerCase();
@@ -166,5 +264,86 @@ public class Excel {
       }
       return false;  
     }
+    String buscaEscuela( String[] InfoFila){
+      
+        for (int i = 0; i < InfoFila.length; i++) {
+            
+            //Si solo son siglas
+             if(InfoFila[i].equals(InfoFila[i].toUpperCase())&&(!InfoFila[i].matches("(.*)[.]"))){
+                 return InfoFila[i];
+             }
+            
+            
+             //Convierte toda la info en minusculas
+            String Info=InfoFila[i].toLowerCase();
+            //Si el nombre contiene escuela                                                                                                                   
+            if(Info.matches("(.*)escuela(.*)")||(Info.matches("(.*)area(.*)"))||(Info.matches("(.*)unidad(.*)"))||(Info.matches("(.*)centro(.*)"))){
+                return InfoFila[i];
+            }
+            if(Info.matches("(.*)carrera(.*)")||(Info.matches("(.*)laboratorio(.*)"))){
+                return InfoFila[i];
+            }
+            //preguntar por si solo espa;ol
+            if((Info.matches("(.*)school(.*)"))||(Info.matches("(.*)department(.*)"))||(Info.matches("(.*)centre(.*)"))||(Info.matches("(.*)center(.*)"))||(Info.matches("(.*)lab(.*)"))||(Info.matches("(.*)laboratory(.*)"))||(Info.matches("(.*)engineering(.*)"))||(Info.matches("(.*)management(.*)"))){
+                return InfoFila[i];
+            }
+            if(Info.matches("(.*)Business administration(.*)")){
+                return "CIADEG-TEC";
+            }
+            if(Info.matches("(.*)inclutec(.*)")||Info.matches("(.*)computación(.*)")||Info.matches("(.*)computación(.*)")){
+                return "CIC";
+            }
+            if(Info.matches("(.*)mechatronics(.*)")){
+                return "Area Académica de Ingeniería en Mecatrónica";
+            }
+             //\\buscar siglas entre parentesis
+             int Par1=InfoFila[i].indexOf("(");
+             if(Par1!=-1){
+                 
+                 int Par2=InfoFila[i].indexOf(")");
+                 String siglas=InfoFila[i].substring(Par1+1, Par2);
+                 //System.out.println(siglas);
+                 //Este es muy especifico 
+                 if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
+                    ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)){
+                    // System.out.println("Reconocida");
+                     return siglas;
+                 }
+                 
+             }
+            
+            
+            
+           
+        }
+         return "No encontrado"; 
+    }
+    String buscaCampus( String[] InfoFila){
+      
+        for (int i = 0; i < InfoFila.length; i++) {
+            //Convierte toda la info en minusculas 
+            String Info=InfoFila[i].toLowerCase();
+            
+            if((Info.matches("(.*)cartago(.*)"))){
+                return "1 - CAMPUS TECNOLOGICO CENTRAL CARTAGO";
+                
+            }
+            if((Info.matches("(.*)san jose(.*)"))||(Info.matches("(.*)san josé(.*)"))){
+                return "2 - CAMPUS TECNOLOGICO LOCAL SAN JOSE";
+            }
+            if((Info.matches("(.*)san carlos(.*)"))){
+                return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";
+            }
+            if((Info.matches("(.*)limón(.*)"))){
+                return "4 - CENTRO ACADÉMICO DE LIMÓN";
+            }
+            if((Info.matches("(.*)alajuela(.*)"))){
+                return "5 - CENTRO ACADEMICO DE ALAJUELA";
+            }
+        }
+        return "No encontrado";
+    }
+    
     
 }
+

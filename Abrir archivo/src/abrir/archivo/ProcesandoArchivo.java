@@ -5,17 +5,24 @@
  */
 package abrir.archivo;
 
+import java.awt.Label;
+import java.io.File;
+
 /**
  *
  * @author Pablo
  */
 public class ProcesandoArchivo extends javax.swing.JFrame {
-
+    File Archivo;
     /**
      * Creates new form vista
      */
     public ProcesandoArchivo() {
         initComponents();
+    }
+    public ProcesandoArchivo(File f) {
+        initComponents();
+        Archivo=f;
     }
 
     /**
@@ -31,8 +38,7 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
         Cancelar = new javax.swing.JButton();
         Inicio = new javax.swing.JButton();
         label1 = new java.awt.Label();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        archSelect = new java.awt.Label();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Procesando archivo");
@@ -51,14 +57,10 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
             }
         });
 
-        label1.setText("Archivos Seleccionados:");
+        label1.setText("Archivo seleccionado:");
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(jList1);
+        archSelect.setBackground(new java.awt.Color(255, 255, 255));
+        archSelect.setText("label2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -73,20 +75,22 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Cancelar))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 164, Short.MAX_VALUE)))
+                        .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 321, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addGap(70, 70, 70)
                 .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(49, 49, 49)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -144,43 +148,45 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
                 new ProcesandoArchivo().setVisible(true);
             }
         });
+        
     }
     private void inicio(){
         //Creamos un Thread para mejorar el ejemplo
+       
+                    
         final Thread t;
         //Inicializamos
         t = new Thread(new Runnable() {
             //Implementamos el método run()
+            
             @Override
             public void run() {
                 //Permite mostrar el valor del progreso
                 jProgressBar1.setStringPainted(true);
                 int x = 1;
                 //Utilizamos un while para emular el valor mínimo y máximo
+                
                 //En este caso 0 - 100
                 while(x <= 100){
                     //Asignamos valor a nuestro JProgressBar por cada siclo del bucle
                     jProgressBar1.setValue(x);
-                    //Hacemos una parada de medio segundo por cada siclo while
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
                     //Se incrementa el valor de x
                     x++;
                 }
                 
                 dispose();
                 
-                Conflictos conflic=new Conflictos();
-                conflic.setTitle("Conflictos encontrados");
-                conflic.setVisible(true);
                 
+                
+                Guardar guardaArch=new Guardar();
                
             }
         });
         //Se ejecuta el Thread
         t.start();
+        //Procesa el archivo
+        Excel ex = new Excel();
+        ex.Importar(Archivo);
         
         
     }
@@ -188,9 +194,13 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cancelar;
     private javax.swing.JButton Inicio;
-    private javax.swing.JList<String> jList1;
+    private java.awt.Label archSelect;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JScrollPane jScrollPane1;
     private java.awt.Label label1;
     // End of variables declaration//GEN-END:variables
+
+    public Label getArchSelect() {
+        return archSelect;
+    }
+
 }

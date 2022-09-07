@@ -26,8 +26,12 @@ public class Guardar {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
             System.out.println("Save as file: " + fileToSave.getAbsolutePath());
-            ProcesandoArchivo Cargando = new ProcesandoArchivo();
-            Cargando.setVisible(true);
+            //ProcesandoArchivo Cargando = new ProcesandoArchivo();
+           // Cargando.setVisible(true);
+           Conflictos conflic=new Conflictos();
+           conflic.setTitle("Conflictos encontrados");
+           conflic.setVisible(true);
+           
         }
     }
    
