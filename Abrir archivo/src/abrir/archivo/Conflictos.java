@@ -5,6 +5,8 @@
  */
 package abrir.archivo;
 
+import javax.swing.JTable;
+
 /**
  *
  * @author Pablo
@@ -173,6 +175,12 @@ public class Conflictos extends javax.swing.JFrame {
             }
         });
     }
+
+    public JTable getjTable1() {
+        return jTable1;
+    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Otro;

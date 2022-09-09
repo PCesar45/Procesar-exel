@@ -31,9 +31,12 @@ import org.apache.poi.xssf.usermodel.*;
 public class Excel {
    
     private static XSSFWorkbook book;
+    
+    private static final XSSFWorkbook book2=new XSSFWorkbook(); ;
     private int columnaCodigo;
     private int columnaTitulo;
     private int columnaAuthorsWithAff;
+
     //esto va a cambiar segun la fila ,por ciclo
     private String Codigo;
     private String Titulo;
@@ -46,22 +49,52 @@ public class Excel {
     private String Pais;
     //Va a guardar la informacion de Authors with affiliations separada por comas
     private String[] AuthorsWithAffDiv;
-    int cantidadAuTec;
+    private static JTable tabla;
+    private static final DefaultTableModel modelo=new DefaultTableModel();
     public Excel() {
     }
-    public String Importar(File archivo){
+    public String Importar(File archivo,ProcesandoArchivo Progreso, JTable tablaExcep){
         String mensaje="Error en la Importacion";
        // DefaultTableModel modelo=new DefaultTableModel();
+        tabla=tablaExcep;
+        tabla.setModel(modelo);
+        //tabla.setDefaultRenderer(Object.class, new Render());
+       //Para guardar el nuevo exel
+       //----------------
+       modelo.addColumn("Codigo");
+       modelo.addColumn("Fila");
+       modelo.addColumn("Tipo");
+       modelo.addColumn("Excel");
+        
+        Sheet hojaGuardar = book2.createSheet("AutoresTEC");
+        //nombres de las columnas del excel nuevo
+        Row fila1=hojaGuardar.createRow(0);
+        Cell celda0=fila1.createCell(0);
+        celda0.setCellValue("EID");
+        Cell celda1=fila1.createCell(1);
+        celda1.setCellValue("Title");
+        Cell celda2=fila1.createCell(2);
+        celda2.setCellValue("Autores");
+        Cell celda3=fila1.createCell(3);
+        celda3.setCellValue("Unidad de investigación");
+        Cell celda4=fila1.createCell(4);
+        celda4.setCellValue("Campus");
+        Cell celda5=fila1.createCell(5);
+        celda5.setCellValue("Universidad");
+        Cell celda6=fila1.createCell(6);
+        celda6.setCellValue("Pais");
 
         
         try {
-            //CREA ARCHIVO CON EXTENSION XLS Y XLSX
-            
             book=new XSSFWorkbook(new FileInputStream(archivo));
             Sheet hoja=book.getSheetAt(0);
             Iterator FilaIterator=hoja.rowIterator();
+            System.out.println(hoja.getLastRowNum());
+            double Porciento=hoja.getLastRowNum()/100;
+            int x = 1;
+            int cont=0;
             int IndiceFila=-1;
-            cantidadAuTec=0;
+            int ContFilas=1;
             //VA SER VERDADERO SI EXISTEN FILAS POR RECORRER
             while (FilaIterator.hasNext()) {                
                 //INDICE FILA AUMENTA 1 POR CADA RECORRIDO
@@ -69,8 +102,8 @@ public class Excel {
                 Row fila=(Row)FilaIterator.next();
                 //RECORRE LAS COLUMNAS O CELDAS DE UNA FILA YA CREADA
                 Iterator ColumnaIterator=fila.cellIterator();
-                //ASIGNAMOS EL MAXIMO DE COLUMNA PERMITIDO
-               // Object[]ListaColumna=new Object[9999];
+                //ASIGNAMOS
+                Object[]ListaColumna=new Object[5];
                //el indice columna vuelve a 0 en cada cambio de fila
                 int IndiceColumna=-1;
                 //VA SER VERDADERO SI EXISTEN COLUMNAS POR RECORRER
@@ -80,8 +113,7 @@ public class Excel {
                     
                     Cell celda=(Cell)ColumnaIterator.next();
                     if(celda!=null){
-                        //System.out.println(celda.getStringCellValue());
-                        //si es la primer fila localizamos en que columna va a estar el codigo ,titulo y Authors with affiliations
+                        //si es la primer fila localizamos en que columna va a estar el codigo ,titulo y Authors with affiliations 
                         if (IndiceFila==0){
                             switch (celda.getStringCellValue()) {
                                 case "EID"://codigo 
@@ -96,7 +128,7 @@ public class Excel {
                                 default:
                                     System.out.println("Error columna no identificada");
                                     break;
-                            }
+                            }   
                         }else{
                             //contenido de la fila
                             
@@ -123,12 +155,9 @@ public class Excel {
                                 for (int i = 0; i < AuthorsWithAffDiv1.length; i++) {
                                    // voy a separar la informacion por las comas
                                     String[] AuthorsWithAffDiv2 = AuthorsWithAffDiv1[i].split(", ");
-
+                                    
                                     for (int j = 0; j < AuthorsWithAffDiv2.length; j++) {
                                         String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
-                                        
-                                        
-
                                         //Se identifica si la informacion se trata del TEC 
                                         if(AnalisisUTec(AuthorsWithAffDivInfo)){
                                             //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
@@ -140,6 +169,12 @@ public class Excel {
                                                 }
                                                 else{
                                                    // si del todo no lo encuentra  lo mandaria a excepciones 
+                                                   Autor="No encontrado";
+                                                   ListaColumna[0]=Codigo;
+                                                   ListaColumna[1]=ContFilas+1;
+                                                   ListaColumna[2]="Autor";
+                                                   ListaColumna[3]="AutoresTEC";
+                                                   modelo.addRow(ListaColumna);
                                                    // System.out.println("Este no lo encuentra");
                                                     //System.out.println(AuthorsWithAffDiv1[i]);
                                                 }
@@ -155,6 +190,12 @@ public class Excel {
                                                  //System.out.println(Codigo);
                                                  //System.out.println(AuthorsWithAffDiv1[i]);
                                                 //Estos a excepciones 
+                                                Escuela="No encontrado";
+                                                ListaColumna[0]=Codigo;
+                                                ListaColumna[1]=ContFilas+1;
+                                                ListaColumna[2]="Escuela o Unidad";
+                                                ListaColumna[3]="AutoresTEC";
+                                                modelo.addRow(ListaColumna);
                                             }
                                             //Campus
                                             String resultadoCampus=buscaCampus(AuthorsWithAffDiv2);
@@ -167,6 +208,12 @@ public class Excel {
                                                  //System.out.println(Codigo);
                                                  //System.out.println(AuthorsWithAffDiv1[i]);
                                                 //Estos a excepciones 
+                                                Campus="No encontrado";
+                                                ListaColumna[0]=Codigo;
+                                                ListaColumna[1]=ContFilas+1;
+                                                ListaColumna[2]="Campus";
+                                                ListaColumna[3]="AutoresTEC";
+                                                modelo.addRow(ListaColumna);
                                             }
                                             //Universidad y Pais autores TEC son fijos
                                             Universidad="Instituto Tecnologico de Costa Rica";
@@ -174,36 +221,44 @@ public class Excel {
 
                                            // System.out.println(Autor);
                                             
-                                            //TEC:System.out.println(AuthorsWithAffDivInfo);
-                                            //System.out.println(AuthorsWithAffDiv1[i]);
-                                            //cantidadAuTec++;
-                                            
-                                            
-                                            //Imprimir todos los datos hasta ahora 
-                                            System.out.println(Codigo +" | "+Titulo+" | "+Autor+" | "+Escuela+" | "+Campus+" | "+Universidad+" | "+Pais);
+                                            //TEC:System.out.println(AuthorsWithAffDivInfo) 
+                                            //System.out.println(ContFilas);
+                                            Row filaNueva=hojaGuardar.createRow(ContFilas);
+                                            Cell celda00=filaNueva.createCell(0);
+                                            celda00.setCellValue(Codigo);
+                                            Cell celda01=filaNueva.createCell(1);
+                                            celda01.setCellValue(Titulo);
+                                            Cell celda02=filaNueva.createCell(2);
+                                            celda02.setCellValue(Autor);
+                                            Cell celda03=filaNueva.createCell(3);
+                                            celda03.setCellValue(Escuela);
+                                            Cell celda04=filaNueva.createCell(4);
+                                            celda04.setCellValue(Campus);
+                                            Cell celda05=filaNueva.createCell(5);
+                                            celda05.setCellValue(Universidad);
+                                            Cell celda06=filaNueva.createCell(6);
+                                            celda06.setCellValue(Pais);
+                                            ContFilas++;
                                         }   
                                     }
-                                    
-                                }
-                                
-                                    
-                                    
-                                
-                            }
-                            
-                            
+                                } 
+                            } 
                         }
-                        
                     }
-                    
-                }
+                }       
+//               if(cont>Porciento){
+//                    System.out.println(x);
+//                    x++;
+//                    cont=0;
+//                    
+//               }
+//               cont++;      
 //                if(IndiceFila==1){
 //                   break; 
 //                }
                
                // if(IndiceFila!=0)modelo.addRow(ListaColumna);
             }
-            System.out.println(cantidadAuTec);
             mensaje="Importacion Exitosa";
             
         } catch (IOException | EncryptedDocumentException e) {
@@ -211,7 +266,32 @@ public class Excel {
         
         return mensaje;
     }
-     String buscaAutor( String[] InfoFila){
+//    public static String Exportar(){
+//        String mensaje="Error en la Exportacion";
+//       
+//        
+//            for (int i = -1; i < NumeroFila; i++) {
+//                Row fila=hoja.createRow(i+1);
+//                for (int j = 0; j <NumeroColumna-1; j++) {
+//                    Cell celda=fila.createCell(j);
+//                    if(i==-1){
+//                        celda.setCellValue(String.valueOf(tabla.getColumnName(j)));
+//                    }else{
+//                        
+//                    }
+//                }
+//            }
+//        
+//    }
+    boolean GuardarExcel(File archivo) throws IOException{
+        File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC.xlsx");
+       // System.out.println(fileC.getAbsolutePath());
+        FileOutputStream fileout = new FileOutputStream(fileC.getAbsolutePath());
+        book2.write(fileout);
+        fileout.close();
+        return true; 
+    }
+    String buscaAutor( String[] InfoFila){
          String autor;
          //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
          //System.out.println(InfoFila[i]);

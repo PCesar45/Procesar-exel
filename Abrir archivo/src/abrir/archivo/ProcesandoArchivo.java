@@ -7,6 +7,10 @@ package abrir.archivo;
 
 import java.awt.Label;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JProgressBar;
 
 /**
  *
@@ -109,7 +113,11 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     }//GEN-LAST:event_CancelarActionPerformed
 
     private void InicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InicioActionPerformed
-        inicio();
+        try {
+            inicio();
+        } catch (IOException ex) {
+            Logger.getLogger(ProcesandoArchivo.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_InicioActionPerformed
 
     /**
@@ -150,44 +158,15 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
         });
         
     }
-    private void inicio(){
-        //Creamos un Thread para mejorar el ejemplo
-       
-                    
-        final Thread t;
-        //Inicializamos
-        t = new Thread(new Runnable() {
-            //Implementamos el método run()
-            
-            @Override
-            public void run() {
-                //Permite mostrar el valor del progreso
-                jProgressBar1.setStringPainted(true);
-                int x = 1;
-                //Utilizamos un while para emular el valor mínimo y máximo
-                
-                //En este caso 0 - 100
-                while(x <= 100){
-                    //Asignamos valor a nuestro JProgressBar por cada siclo del bucle
-                    jProgressBar1.setValue(x);
-                    //Se incrementa el valor de x
-                    x++;
-                }
-                
-                dispose();
-                
-                
-                
-                Guardar guardaArch=new Guardar();
-               
-            }
-        });
-        //Se ejecuta el Thread
-        t.start();
-        //Procesa el archivo
-        Excel ex = new Excel();
-        ex.Importar(Archivo);
+    private void inicio() throws IOException{
         
+        
+        
+        Excel ex = new Excel();
+         dispose();
+        //Procesa el archivo
+        Guardar guarda=new Guardar(ex);
+        ex.Importar(Archivo,ProcesandoArchivo.this,guarda.getTablaConflictos());
         
     }
 
@@ -198,9 +177,14 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBar1;
     private java.awt.Label label1;
     // End of variables declaration//GEN-END:variables
-
+    
     public Label getArchSelect() {
         return archSelect;
     }
+
+    public JProgressBar getjProgressBar1() {
+        return jProgressBar1;
+    }
+    
 
 }

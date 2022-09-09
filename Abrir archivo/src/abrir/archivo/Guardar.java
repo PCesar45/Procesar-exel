@@ -6,16 +6,18 @@
 package abrir.archivo;
 
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 
 /**
  *
  * @author Pablo
  */
 public class Guardar {
-
-    public Guardar() {
+    Conflictos conflic=new Conflictos();
+    public Guardar(Excel ex) throws IOException {
         JFrame parentFrame = new JFrame();
  
         JFileChooser fileChooser = new JFileChooser();
@@ -28,12 +30,15 @@ public class Guardar {
             System.out.println("Save as file: " + fileToSave.getAbsolutePath());
             //ProcesandoArchivo Cargando = new ProcesandoArchivo();
            // Cargando.setVisible(true);
-           Conflictos conflic=new Conflictos();
+           ex.GuardarExcel(fileToSave);
+           
            conflic.setTitle("Conflictos encontrados");
            conflic.setVisible(true);
            
         }
     }
-   
+    public JTable getTablaConflictos(){
+        return conflic.getjTable1();
+    } 
     
 }
