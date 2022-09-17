@@ -7,6 +7,7 @@ package abrir.archivo;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -16,7 +17,7 @@ import javax.swing.JTable;
  * @author Pablo
  */
 public class Guardar {
-    Conflictos conflic=new Conflictos();
+    
     public Guardar(Excel ex) throws IOException {
         JFrame parentFrame = new JFrame();
  
@@ -31,14 +32,10 @@ public class Guardar {
             //ProcesandoArchivo Cargando = new ProcesandoArchivo();
            // Cargando.setVisible(true);
            ex.GuardarExcel(fileToSave);
-           
-           conflic.setTitle("Conflictos encontrados");
-           conflic.setVisible(true);
-           
+           ExitoGuardar exito=new ExitoGuardar(parentFrame, true);
+           exito.setVisible(true);
         }
     }
-    public JTable getTablaConflictos(){
-        return conflic.getjTable1();
-    } 
+    
     
 }

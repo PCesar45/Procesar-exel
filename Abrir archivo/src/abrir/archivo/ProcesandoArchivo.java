@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JProgressBar;
+import javax.swing.JTable;
 
 /**
  *
@@ -18,6 +19,7 @@ import javax.swing.JProgressBar;
  */
 public class ProcesandoArchivo extends javax.swing.JFrame {
     File Archivo;
+   
     /**
      * Creates new form vista
      */
@@ -38,14 +40,25 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jProgressBar1 = new javax.swing.JProgressBar();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
+        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         Cancelar = new javax.swing.JButton();
         Inicio = new javax.swing.JButton();
         label1 = new java.awt.Label();
         archSelect = new java.awt.Label();
+        rb_Scopus = new javax.swing.JRadioButton();
+        rb_WoS = new javax.swing.JRadioButton();
+
+        jRadioButtonMenuItem1.setSelected(true);
+        jRadioButtonMenuItem1.setText("jRadioButtonMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Procesando archivo");
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setLocation(new java.awt.Point(500, 500));
+        setLocationByPlatform(true);
 
         Cancelar.setText("Cancelar");
         Cancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -61,46 +74,67 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
             }
         });
 
+        label1.setFont(new java.awt.Font("Trebuchet MS", 0, 14)); // NOI18N
         label1.setText("Archivo seleccionado:");
 
+        archSelect.setAlignment(java.awt.Label.CENTER);
         archSelect.setBackground(new java.awt.Color(255, 255, 255));
-        archSelect.setText("label2");
+        archSelect.setFont(new java.awt.Font("Trebuchet MS", 0, 14)); // NOI18N
+
+        rb_Scopus.setText("Scopus");
+        rb_Scopus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_ScopusActionPerformed(evt);
+            }
+        });
+
+        rb_WoS.setText("WoS");
+        rb_WoS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_WoSActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(rb_Scopus)
+                                    .addComponent(rb_WoS))))
+                        .addGap(0, 45, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(Inicio)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Cancelar))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 321, Short.MAX_VALUE)))
+                        .addComponent(Cancelar)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(70, 70, 70)
-                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(23, 23, 23)
+                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
+                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rb_Scopus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rb_WoS)
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Inicio)
                     .addComponent(Cancelar))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         label1.getAccessibleContext().setAccessibleName("Archivo Seleccionado");
@@ -119,6 +153,18 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
             Logger.getLogger(ProcesandoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_InicioActionPerformed
+
+    private void rb_ScopusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ScopusActionPerformed
+        if(rb_WoS.isSelected()){
+            rb_WoS.setSelected(false);
+        }
+    }//GEN-LAST:event_rb_ScopusActionPerformed
+
+    private void rb_WoSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_WoSActionPerformed
+        if(rb_Scopus.isSelected()){
+            rb_Scopus.setSelected(false);
+        }
+    }//GEN-LAST:event_rb_WoSActionPerformed
 
     /**
      * @param args the command line arguments
@@ -161,12 +207,21 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     private void inicio() throws IOException{
         
         
-        
+       
         Excel ex = new Excel();
          dispose();
+        Conflictos conflic=new Conflictos(ex);
         //Procesa el archivo
-        Guardar guarda=new Guardar(ex);
-        ex.Importar(Archivo,ProcesandoArchivo.this,guarda.getTablaConflictos());
+        
+        conflic.setTitle("Conflictos encontrados");
+        conflic.setVisible(true);
+        Documento doc;
+        if(rb_Scopus.isSelected()){
+            doc=Documento.scopus;
+        }else{
+            doc=Documento.WoS;
+        }
+        ex.Importar(Archivo,this,conflic.getjTable1(),doc);
         
     }
 
@@ -174,17 +229,20 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     private javax.swing.JButton Cancelar;
     private javax.swing.JButton Inicio;
     private java.awt.Label archSelect;
-    private javax.swing.JProgressBar jProgressBar1;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private java.awt.Label label1;
+    private javax.swing.JRadioButton rb_Scopus;
+    private javax.swing.JRadioButton rb_WoS;
     // End of variables declaration//GEN-END:variables
     
     public Label getArchSelect() {
         return archSelect;
     }
 
-    public JProgressBar getjProgressBar1() {
-        return jProgressBar1;
-    }
-    
+
+     
 
 }

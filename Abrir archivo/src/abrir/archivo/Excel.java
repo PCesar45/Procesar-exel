@@ -48,23 +48,26 @@ public class Excel {
     private String Universidad;
     private String Pais;
     //Va a guardar la informacion de Authors with affiliations separada por comas
-    private String[] AuthorsWithAffDiv;
+    //private String[] AuthorsWithAffDiv;
+    private static final ArrayList<String> Conflictos=new ArrayList<>();;
     private static JTable tabla;
     private static final DefaultTableModel modelo=new DefaultTableModel();
-    public Excel() {
-    }
-    public String Importar(File archivo,ProcesandoArchivo Progreso, JTable tablaExcep){
+    //Botones de resolver conflictos
+    //private static ArrayList<JButton> botones=new ArrayList<>();
+    public Excel() {}
+    public String Importar(File archivo,ProcesandoArchivo Progreso, JTable tablaExcep,Documento doc){
         String mensaje="Error en la Importacion";
        // DefaultTableModel modelo=new DefaultTableModel();
         tabla=tablaExcep;
         tabla.setModel(modelo);
-        //tabla.setDefaultRenderer(Object.class, new Render());
+        tabla.setDefaultRenderer(Object.class, new Render());
        //Para guardar el nuevo exel
        //----------------
        modelo.addColumn("Codigo");
        modelo.addColumn("Fila");
        modelo.addColumn("Tipo");
        modelo.addColumn("Excel");
+       modelo.addColumn("Resolver");
         
         Sheet hojaGuardar = book2.createSheet("AutoresTEC");
         //nombres de las columnas del excel nuevo
@@ -110,25 +113,43 @@ public class Excel {
                 while (ColumnaIterator.hasNext()) {                    
                     //INDICE COLUMNA AUMENTA 1 POR CADA RECORRIDO
                     IndiceColumna++;
-                    
+                   
                     Cell celda=(Cell)ColumnaIterator.next();
                     if(celda!=null){
                         //si es la primer fila localizamos en que columna va a estar el codigo ,titulo y Authors with affiliations 
                         if (IndiceFila==0){
-                            switch (celda.getStringCellValue()) {
-                                case "EID"://codigo 
-                                    columnaCodigo=IndiceColumna;
-                                    break;
-                                case "Title"://Titulo 
-                                    columnaTitulo=IndiceColumna;
-                                    break;
-                                case "Authors with affiliations": 
-                                    columnaAuthorsWithAff=IndiceColumna;
-                                    break;
-                                default:
-                                    System.out.println("Error columna no identificada");
-                                    break;
-                            }   
+                            if(doc==Documento.scopus){
+                                switch (celda.getStringCellValue()) {
+                                    case ("EID")://codigo 
+                                        columnaCodigo=IndiceColumna;
+                                        break;
+                                    case "Title"://Titulo 
+                                        columnaTitulo=IndiceColumna;
+                                        break;
+                                    case "Authors with affiliations": 
+                                        columnaAuthorsWithAff=IndiceColumna;
+                                        break;
+                                    default:
+                                        System.out.println("Error columna no identificada");
+                                        break;
+                                }
+                            }
+                            else{
+                                switch (celda.getStringCellValue()) {
+                                 case ("UT (Unique WOS ID)")://codigo 
+                                     columnaCodigo=IndiceColumna;
+                                     break;
+                                 case "Article Title"://Titulo 
+                                     columnaTitulo=IndiceColumna;
+                                     break;
+                                 case "Addresses": 
+                                     columnaAuthorsWithAff=IndiceColumna;
+                                     break;
+                                 default:
+                                     System.out.println("Error columna no identificada");
+                                     break;
+                             } 
+                            }
                         }else{
                             //contenido de la fila
                             
@@ -160,25 +181,36 @@ public class Excel {
                                         String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
                                         //Se identifica si la informacion se trata del TEC 
                                         if(AnalisisUTec(AuthorsWithAffDivInfo)){
-                                            //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
-                                            if(!"No encontrado".equals(AnalisisAutor(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
-                                                Autor=AnalisisAutor(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
-                                            }else{//en caso de que no lo encuentre lo busca en toda la linea 
-                                                if(!"No encontrado".equals(buscaAutor(AuthorsWithAffDiv2))){
-                                                    Autor=buscaAutor(AuthorsWithAffDiv2);
-                                                }
-                                                else{
-                                                   // si del todo no lo encuentra  lo mandaria a excepciones 
-                                                   Autor="No encontrado";
-                                                   ListaColumna[0]=Codigo;
-                                                   ListaColumna[1]=ContFilas+1;
-                                                   ListaColumna[2]="Autor";
-                                                   ListaColumna[3]="AutoresTEC";
-                                                   modelo.addRow(ListaColumna);
-                                                   // System.out.println("Este no lo encuentra");
-                                                    //System.out.println(AuthorsWithAffDiv1[i]);
+                                            if(doc==Documento.scopus){
+                                                //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
+                                                if(!"No encontrado".equals(AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
+                                                    Autor=AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
+                                                }else{//en caso de que no lo encuentre lo busca en toda la linea 
+                                                    if(!"No encontrado".equals(buscaAutorScopus(AuthorsWithAffDiv2))){
+                                                        Autor=buscaAutorScopus(AuthorsWithAffDiv2);
+                                                    }
+                                                    else{
+                                                       // si del todo no lo encuentra  lo mandaria a excepciones 
+                                                       Autor="No encontrado";
+                                                       ListaColumna[0]=Codigo;
+                                                       ListaColumna[1]=ContFilas+1;
+                                                       ListaColumna[2]="Autor";
+                                                       ListaColumna[3]="AutoresTEC";
+                                                       modelo.addRow(ListaColumna);
+                                                       ResolverConflictos(AuthorsWithAffDiv1[i]);
+                                                       // System.out.println("Este no lo encuentra");
+                                                        //System.out.println(AuthorsWithAffDiv1[i]);
+                                                    }
+
+
                                                 }
                                             }
+                                             //Si no es Scopus es WoS
+                                            else{
+                                                
+                                                   
+                                            }
+                                            
                                             //Escuela
                                             String resultadoEscuela=buscaEscuela(AuthorsWithAffDiv2);
                                             if(!"No encontrado".equals(resultadoEscuela)){
@@ -196,6 +228,7 @@ public class Excel {
                                                 ListaColumna[2]="Escuela o Unidad";
                                                 ListaColumna[3]="AutoresTEC";
                                                 modelo.addRow(ListaColumna);
+                                                ResolverConflictos(AuthorsWithAffDiv1[i]);
                                             }
                                             //Campus
                                             String resultadoCampus=buscaCampus(AuthorsWithAffDiv2);
@@ -214,6 +247,7 @@ public class Excel {
                                                 ListaColumna[2]="Campus";
                                                 ListaColumna[3]="AutoresTEC";
                                                 modelo.addRow(ListaColumna);
+                                                ResolverConflictos(AuthorsWithAffDiv1[i]);
                                             }
                                             //Universidad y Pais autores TEC son fijos
                                             Universidad="Instituto Tecnologico de Costa Rica";
@@ -239,6 +273,7 @@ public class Excel {
                                             Cell celda06=filaNueva.createCell(6);
                                             celda06.setCellValue(Pais);
                                             ContFilas++;
+                                           // System.out.println(ContFilas);
                                         }   
                                     }
                                 } 
@@ -283,15 +318,23 @@ public class Excel {
 //            }
 //        
 //    }
-    boolean GuardarExcel(File archivo) throws IOException{
+    public void ResolverConflictos(String infoCompleta){
+           // System.out.println(sismos.get(v));
+            Conflictos.add(infoCompleta);
+            JButton boton =new JButton("Resolver");
+            //System.out.println(modelo.getRowCount()-1+","+modelo.findColumn("Resolver"));
+            modelo.setValueAt(boton, modelo.getRowCount()-1, modelo.findColumn("Resolver"));
+    } 
+    public boolean GuardarExcel(File archivo) throws IOException{
         File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC.xlsx");
-       // System.out.println(fileC.getAbsolutePath());
-        FileOutputStream fileout = new FileOutputStream(fileC.getAbsolutePath());
-        book2.write(fileout);
-        fileout.close();
-        return true; 
+        try ( // System.out.println(fileC.getAbsolutePath());
+                FileOutputStream fileout = new FileOutputStream(fileC.getAbsolutePath())) {
+                book2.write(fileout);
+                return true; 
+                
+        }
     }
-    String buscaAutor( String[] InfoFila){
+    String buscaAutorScopus( String[] InfoFila){
          String autor;
          //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
          //System.out.println(InfoFila[i]);
@@ -308,7 +351,7 @@ public class Excel {
         
         return "No encontrado";
     }
-    String AnalisisAutor( String Autor,String Iniciales){
+    String AnalisisAutorScopus( String Autor,String Iniciales){
          String autor;
          //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
          //System.out.println(InfoFila[i]);
@@ -357,25 +400,47 @@ public class Excel {
              //Convierte toda la info en minusculas
             String Info=InfoFila[i].toLowerCase();
             //Si el nombre contiene escuela                                                                                                                   
-            if(Info.matches("(.*)escuela(.*)")||(Info.matches("(.*)area(.*)"))||(Info.matches("(.*)unidad(.*)"))||(Info.matches("(.*)centro(.*)"))){
-                return InfoFila[i];
-            }
-            if(Info.matches("(.*)carrera(.*)")||(Info.matches("(.*)laboratorio(.*)"))){
-                return InfoFila[i];
-            }
-            //preguntar por si solo espa;ol
-            if((Info.matches("(.*)school(.*)"))||(Info.matches("(.*)department(.*)"))||(Info.matches("(.*)centre(.*)"))||(Info.matches("(.*)center(.*)"))||(Info.matches("(.*)lab(.*)"))||(Info.matches("(.*)laboratory(.*)"))||(Info.matches("(.*)engineering(.*)"))||(Info.matches("(.*)management(.*)"))){
-                return InfoFila[i];
-            }
-            if(Info.matches("(.*)Business administration(.*)")){
+            
+            
+//            //preguntar por si solo espa;ol
+//            if((Info.matches("(.*)school(.*)"))||(Info.matches("(.*)department(.*)"))||(Info.matches("(.*)centre(.*)"))||(Info.matches("(.*)center(.*)"))||(Info.matches("(.*)lab(.*)"))||(Info.matches("(.*)laboratory(.*)"))||(Info.matches("(.*)engineering(.*)"))||(Info.matches("(.*)management(.*)"))){
+//                return InfoFila[i];
+//            }
+            if(Info.matches("(.*)Business(.*)")||(Info.matches("(.*)administración(.*)")&&(Info.matches("(.*)empresas(.*)")))||(Info.matches("(.*)administracion(.*)")&&(Info.matches("(.*)empresas(.*)")))){
                 return "CIADEG-TEC";
             }
-            if(Info.matches("(.*)inclutec(.*)")||Info.matches("(.*)computación(.*)")||Info.matches("(.*)computación(.*)")){
+            if(Info.matches("(.*)biología(.*)")||(Info.matches("(.*)biologia(.*)"))||(Info.matches("(.*)biology(.*)"))||(Info.matches("(.*)biotecnología(.*)"))||(Info.matches("(.*)biotecnologia(.*)"))||(Info.matches("(.*)biotechnology(.*)"))||(Info.matches("(.*)biotech(.*)"))){
+                return "CIB";
+            }
+            if(Info.matches("(.*)inclutec(.*)")||Info.matches("(.*)computación(.*)")||Info.matches("(.*)computacion(.*)")||Info.matches("(.*)computer(.*)")){
                 return "CIC";
             }
-            if(Info.matches("(.*)mechatronics(.*)")){
-                return "Area Académica de Ingeniería en Mecatrónica";
+            if(Info.matches("(.*)forestal(.*)")||(Info.matches("(.*)forestry(.*)"))||(Info.matches("(.*)forest(.*)"))){
+                return "CIF";
             }
+            if(Info.matches("(.*)environmental protection(.*)")||(Info.matches("(.*)proteccion ambiental(.*)"))||(Info.matches("(.*)protección ambiental(.*)"))){
+                return "CIPA";
+            }
+            if(Info.matches("(.*)construccion(.*)")||(Info.matches("(.*)construcción(.*)"))||(Info.matches("(.*)building(.*)"))||(Info.matches("(.*)vivienda(.*)"))||(Info.matches("(.*)dwelling(.*)"))||(Info.matches("(.*)structure(.*)"))){
+                return "CIVCO";
+            }
+            
+            if(Info.matches("(.*)quimica(.*)")||(Info.matches("(.*)química(.*)"))||(Info.matches("(.*)chemistry(.*)"))||(Info.matches("(.*)microbiologicos(.*)"))||(Info.matches("(.*)microbiológicos(.*)"))){
+                return "CEQIATEC";
+            }
+            if(Info.matches("(.*)agronomia(.*)")||(Info.matches("(.*)agronomía(.*)"))||(Info.matches("(.*)agronomıa(.*)"))||(Info.matches("(.*)agronomy(.*)"))){
+                return "CIDASTH";
+            }
+            if(Info.matches("(.*)materiales(.*)")||(Info.matches("(.*)material(.*)"))||(Info.matches("(.*)materials(.*)"))){
+                return "CIEMTEC";
+            }
+            if(Info.matches("(.*)agroindustrial(.*)")||(Info.matches("(.*)agronegocios(.*)"))||(Info.matches("(.*)agribusiness(.*)"))){
+                return "CIGA";
+            }
+            if(Info.matches("(.*)ciencias naturales(.*)")||(Info.matches("(.*)doctorado(.*)"))||(Info.matches("(.*)zootecnia(.*)"))||(Info.matches("(.*)natural sciences(.*)"))||(Info.matches("(.*)animal husbandry(.*)"))){
+                return "DOCINADE";
+            }
+            
              //\\buscar siglas entre parentesis
              int Par1=InfoFila[i].indexOf("(");
              if(Par1!=-1){
@@ -391,6 +456,16 @@ public class Excel {
                  }
                  
              }
+            if(Info.matches("(.*)mechatronics(.*)")){
+                return "Area Académica de Ingeniería en Mecatrónica";
+            }
+            if(Info.matches("(.*)escuela(.*)")||(Info.matches("(.*)area(.*)"))||(Info.matches("(.*)unidad(.*)"))||(Info.matches("(.*)centro(.*)"))){
+                return InfoFila[i];
+            }
+            if(Info.matches("(.*)carrera(.*)")||(Info.matches("(.*)laboratorio(.*)"))){
+                return InfoFila[i];
+            }
+            
             
             
             
@@ -423,6 +498,19 @@ public class Excel {
         }
         return "No encontrado";
     }
+
+    public static ArrayList<String> getConflictos() {
+        return Conflictos;
+    }
+
+    public static XSSFWorkbook getBook2() {
+        return book2;
+    }
+
+    public static DefaultTableModel getModelo() {
+        return modelo;
+    }
+    
     
     
 }

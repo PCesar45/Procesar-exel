@@ -5,6 +5,10 @@
  */
 package abrir.archivo;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 
 /**
@@ -12,13 +16,22 @@ import javax.swing.JTable;
  * @author Pablo
  */
 public class Conflictos extends javax.swing.JFrame {
-
+    private Excel excel;
     /**
      * Creates new form Conflictos
      */
     public Conflictos() {
         initComponents();
     }
+
+    public Conflictos(Excel excel) {
+        initComponents();
+        this.excel = excel;
+       
+    }
+
+  
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,71 +45,68 @@ public class Conflictos extends javax.swing.JFrame {
         scrollPane1 = new java.awt.ScrollPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        Otro = new javax.swing.JButton();
+        Guardar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Código", "Fila", "Tipo", "Exel"
+                "Código", "Fila", "Tipo", "Exel", "Resolver "
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         scrollPane1.add(jScrollPane1);
 
-        jButton1.setText("Finalizar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        Guardar.setText("Guardar");
+        Guardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        Otro.setText("Procesar otro documento");
-        Otro.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                OtroActionPerformed(evt);
+                GuardarActionPerformed(evt);
             }
         });
 
@@ -105,16 +115,13 @@ public class Conflictos extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addComponent(Otro)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 645, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                .addContainerGap()
+                .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(Guardar)
+                .addGap(26, 863, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -122,25 +129,42 @@ public class Conflictos extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(scrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 473, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(Otro))
+                .addComponent(Guardar)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.dispose();
-        System.exit(0);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void OtroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OtroActionPerformed
+    private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
         dispose();
-        Abrir abre=new Abrir();
-    }//GEN-LAST:event_OtroActionPerformed
+        try {
+            Guardar guarda=new Guardar(excel);
+        } catch (IOException ex) {
+            Logger.getLogger(Conflictos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_GuardarActionPerformed
 
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+                      
+        int fila=jTable1.rowAtPoint(evt.getPoint());
+        int columna=jTable1.columnAtPoint(evt.getPoint());
+        //System.out.println(columna);
+        if(fila < jTable1.getRowCount() && fila >=0 && columna < jTable1.getColumnCount() && columna>=0){
+            System.out.println(fila);
+            if(columna==4){
+                ResolverConflictos resol=new ResolverConflictos(Excel.getBook2(),fila,columna, (int) jTable1.getValueAt(fila, 1));
+                resol.getInfoLinea().setText(Excel.getConflictos().get(fila));
+                resol.getTipo().setText((String) jTable1.getValueAt(fila, 2));
+                resol.setVisible(true);
+                
+                
+            }
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    
+     
     /**
      * @param args the command line arguments
      */
@@ -183,8 +207,7 @@ public class Conflictos extends javax.swing.JFrame {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Otro;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton Guardar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private java.awt.ScrollPane scrollPane1;
