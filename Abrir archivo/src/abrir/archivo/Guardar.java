@@ -31,7 +31,7 @@ public class Guardar {
             System.out.println("Save as file: " + fileToSave.getAbsolutePath());
             //ProcesandoArchivo Cargando = new ProcesandoArchivo();
            // Cargando.setVisible(true);
-           ex.GuardarExcel(fileToSave);
+           ex.GuardarExcelTEC(fileToSave);
            ExitoGuardar exito=new ExitoGuardar(parentFrame, true);
            exito.setVisible(true);
         }

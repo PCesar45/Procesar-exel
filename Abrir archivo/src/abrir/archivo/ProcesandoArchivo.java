@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JTable;
 
@@ -207,21 +208,24 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
     private void inicio() throws IOException{
         
         
-       
-        Excel ex = new Excel();
-         dispose();
-        Conflictos conflic=new Conflictos(ex);
-        //Procesa el archivo
-        
-        conflic.setTitle("Conflictos encontrados");
-        conflic.setVisible(true);
-        Documento doc;
-        if(rb_Scopus.isSelected()){
-            doc=Documento.scopus;
+        if(!rb_Scopus.isSelected()&&!rb_WoS.isSelected()){
+            JOptionPane.showMessageDialog(null, "Seleccione un tipo de archivo");
         }else{
-            doc=Documento.WoS;
+            Excel ex = new Excel();
+             dispose();
+            Conflictos conflic=new Conflictos(ex);
+            //Procesa el archivo
+
+            conflic.setTitle("Conflictos encontrados");
+            conflic.setVisible(true);
+            Documento doc;
+            if(rb_Scopus.isSelected()){
+                doc=Documento.scopus;
+            }else{
+                doc=Documento.WoS;
+            }
+            ex.Importar(Archivo,this,conflic.getjTable1(),doc);
         }
-        ex.Importar(Archivo,this,conflic.getjTable1(),doc);
         
     }
 
