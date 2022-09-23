@@ -47,7 +47,7 @@ public class Excel {
     private String Campus;
     private String Universidad;
     private String Pais;
-    private  ArrayList<String> AutoresWoS;
+    private  ArrayList<String> AutoresWoS=new ArrayList<>();;
     //Va a guardar la informacion de Authors with affiliations separada por comas
     //private String[] AuthorsWithAffDiv;
     private static ArrayList<String> Conflictos;
@@ -56,6 +56,7 @@ public class Excel {
     //Botones de resolver conflictos
     //private static ArrayList<JButton> botones=new ArrayList<>();
     public Excel() {
+        System.out.println("Inicializa");
         book2=new XSSFWorkbook(); 
         AutoresWoS=new ArrayList<>();
         Conflictos=new ArrayList<>();
@@ -103,6 +104,7 @@ public class Excel {
             double Porciento=hoja.getLastRowNum()/100;
             int x = 1;
             int cont=0;
+             int contAutoresWoS=-1;
             int IndiceFila=-1;
             int ContFilas=1;
             //VA SER VERDADERO SI EXISTEN FILAS POR RECORRER
@@ -142,8 +144,8 @@ public class Excel {
                                 }
                             }
                             else{
-                                System.out.println(IndiceColumna);
-                                System.out.println(celda.getStringCellValue());
+                              //  System.out.println(IndiceColumna);
+                               // System.out.println(celda.getStringCellValue());
                                 switch (celda.getStringCellValue()) {
                                  case ("UT (Unique WOS ID)")://codigo 
                                      columnaCodigo=IndiceColumna;
@@ -168,7 +170,7 @@ public class Excel {
                             if(IndiceColumna==columnaCodigo){
                                 
                                Codigo=celda.getStringCellValue();
-                               //System.out.println(Codigo);
+                             //  System.out.println("Codigo: "+Codigo);
                             }
                             //Saca el titulo y lo guarda temporalmente
                             if(IndiceColumna==columnaTitulo){
@@ -180,14 +182,18 @@ public class Excel {
                                // System.out.println(celda.getStringCellValue());
                                 AuthorsWithAff=celda.getStringCellValue();
                                 //Si se trata de Wos aqui se le dara el mismo formato que Scopus
+                               
                                 if(doc==Documento.WoS){
+                                  //   System.out.println(AuthorsWithAff);
                                      AuthorsWithAff=DarFormato(AuthorsWithAff);
                                 }
                                 //Aqui se va a analizar y separar la columan de Authors with affiliations
                                 //primero voy a remplazar los ; por , para procesar toda la informacion por igual 
+                               // System.out.println(AuthorsWithAff);
                                 String[] AuthorsWithAffDiv1 = AuthorsWithAff.split("; ");
                                 
                                 for (int i = 0; i < AuthorsWithAffDiv1.length; i++) {
+                                    contAutoresWoS++;
                                    // voy a separar la informacion por las comas
                                     String[] AuthorsWithAffDiv2 = AuthorsWithAffDiv1[i].split(", ");
                                     
@@ -195,32 +201,39 @@ public class Excel {
                                         String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
                                         if(doc==Documento.scopus){
                                             //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
-                                            if(!"No encontrado".equals(AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
-                                                Autor=AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
-                                            }else{//en caso de que no lo encuentre lo busca en toda la linea 
-                                                if(!"No encontrado".equals(buscaAutorScopus(AuthorsWithAffDiv2))){
-                                                    Autor=buscaAutorScopus(AuthorsWithAffDiv2);
-                                                }
-                                                else{
-                                                   // si del todo no lo encuentra  lo mandaria a excepciones 
-                                                   Autor="No encontrado";
-                                                   ListaColumna[0]=Codigo;
-                                                   ListaColumna[1]=ContFilas+1;
-                                                   ListaColumna[2]="Autor";
-                                                   ListaColumna[3]="AutoresTEC";
-                                                   modelo.addRow(ListaColumna);
-                                                   ResolverConflictos(AuthorsWithAffDiv1[i]);
-                                                   // System.out.println("Este no lo encuentra");
-                                                    //System.out.println(AuthorsWithAffDiv1[i]);
-                                                }
+                                            if(AuthorsWithAffDiv2.length>=2){
+                                                if(!"No encontrado".equals(AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
+                                                    Autor=AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
+                                                }else{//en caso de que no lo encuentre lo busca en toda la linea 
+                                                    if(!"No encontrado".equals(buscaAutorScopus(AuthorsWithAffDiv2))){
+                                                        Autor=buscaAutorScopus(AuthorsWithAffDiv2);
+                                                    }
+                                                    else{
+                                                       // si del todo no lo encuentra  lo mandaria a excepciones 
+                                                       Autor="No encontrado";
+                                                       ListaColumna[0]=Codigo;
+                                                       ListaColumna[1]=ContFilas+1;
+                                                       ListaColumna[2]="Autor";
+                                                       ListaColumna[3]="AutoresTEC";
+                                                       modelo.addRow(ListaColumna);
+                                                       ResolverConflictos(AuthorsWithAffDiv1[i]);
+                                                       // System.out.println("Este no lo encuentra");
+                                                        //System.out.println(AuthorsWithAffDiv1[i]);
+                                                    }
 
 
+                                                }
                                             }
                                         }
                                          //Si no es Scopus es WoS
                                         else{
-                                            Autor=AutoresWoS.get(ContFilas-1);
-                                            //System.out.println(Autor);
+//                                            while (contAutoresWoS<AutoresWoS.size()) {                                                
+//                                                Autor=AutoresWoS.get(contAutoresWoS);
+//                                                contAutoresWoS++;
+//                                            }
+                                            //System.out.println();
+                                            Autor=AutoresWoS.get(contAutoresWoS);
+                                           // System.out.println(contAutoresWoS);
                                         }
                                         //Se identifica si la informacion se trata del TEC 
                                         if(AnalisisUTec(AuthorsWithAffDivInfo)){
@@ -297,10 +310,10 @@ public class Excel {
                                             Cell celda06=filaNueva.createCell(6);
                                             celda06.setCellValue(Pais);
                                             ContFilas++;
-                                            System.out.println(ContFilas);
+                                           // System.out.println(ContFilas);
                                         }else{//Autores externos
                                             //Analizar Universidad (API)
-                                            
+                                            System.out.println(AuthorsWithAffDivInfo);
                                             
                                             
                                             //Analizar Pais(API)
@@ -417,11 +430,19 @@ public class Excel {
       if((Info.matches("(.*)institute(.*)"))&&(Info.matches("(.*)costa rican(.*)"))){
            return true;
       }
+      if((Info.matches("(.*)technology(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
+           return true;
+      }
       //Casos WoS
       if((Info.matches("(.*)ins(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
           return true;
       }
-      return false;  
+      if((Info.matches("(.*)tecnol(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
+          return true;
+      }
+      else{
+           return false; 
+      }
     }
     String buscaEscuela( String[] InfoFila){
       
@@ -475,6 +496,10 @@ public class Excel {
              ||(Info.matches("(.*)microbiologicos(.*)"))||(Info.matches("(.*)microbiológicos(.*)"))||(Info.matches("(.*)ceqiatec(.*)"))||(Info.matches("(.*)quim(.*)"))){
                 return "CEQIATEC";
             }
+            if(Info.matches("(.*)agroindustrial(.*)")||(Info.matches("(.*)agronegocios(.*)"))||(Info.matches("(.*)agribusiness(.*)"))
+                ||(Info.matches("(.*)ciga(.*)"))){
+                return "CIGA";
+            }
             if(Info.matches("(.*)agronomia(.*)")||(Info.matches("(.*)agronomía(.*)"))||(Info.matches("(.*)agronomıa(.*)"))
                 ||(Info.matches("(.*)agronomy(.*)"))||(Info.matches("(.*)agr(.*)"))||(Info.matches("(.*)agricultural(.*)"))
                 ||(Info.matches("(.*)cidasth(.*)"))||(Info.matches("(.*)plantations(.*)"))){
@@ -483,10 +508,7 @@ public class Excel {
             if(Info.matches("(.*)materiales(.*)")||(Info.matches("(.*)material(.*)"))||(Info.matches("(.*)materials(.*)"))||(Info.matches("(.*)ciemtec(.*)"))){
                 return "CIEMTEC";
             }
-            if(Info.matches("(.*)agroindustrial(.*)")||(Info.matches("(.*)agronegocios(.*)"))||(Info.matches("(.*)agribusiness(.*)"))
-                ||(Info.matches("(.*)ciga(.*)"))){
-                return "CIGA";
-            }
+            
             if(Info.matches("(.*)ciencias naturales(.*)")||(Info.matches("(.*)doctorado(.*)"))||(Info.matches("(.*)zootecnia(.*)"))
                     ||(Info.matches("(.*)natural sciences(.*)"))||(Info.matches("(.*)animal husbandry(.*)"))||(Info.matches("(.*)docinade(.*)"))){
                 return "DOCINADE";
@@ -554,6 +576,7 @@ public class Excel {
     public String DarFormato(String InfoLinea){
         String formato="";
         //Dividide la informacion entre los parentesis [ 
+       // AutoresWoS.clear();
         String [] Div1=InfoLinea.split("\\[");
        // String[] A="[Pino-Gomez, Macario] Inst Tecnol Costa Rica, Sch Envirom Engn, Ctr Invest & Protecc Ambiental CIPA, Cartago, Costa Rica; [Soto-Cordoba, Silvia M.; Gaviria-Montoya, Lilliana] Inst Tecnol Costa Rica, Sch Chem, Ctr Invest & Protecc Ambiental CIPA, Apartado 159-7050, Cartago, Costa Rica".split("\\[");
         for (int i = 0; i < Div1.length; i++) {
@@ -561,7 +584,7 @@ public class Excel {
               if(cerrar!=-1){
                 String Autores=Div1[i].substring(0, cerrar);
                 String Info=Div1[i].substring(cerrar+1);
-                
+                Info=Info.replaceAll(";", "");
                 //Procesamiento de los autores
                 String[] autor=Autores.split("; ");
                   for (int j = 0; j < autor.length; j++) {
@@ -569,14 +592,20 @@ public class Excel {
                     //System.out.println(autor[j]);
                     AutoresWoS.add(autor[j]);
                     //solo se necesita la info
-                    formato=formato.concat(autor[j]+Info);
+                    formato=formato.concat(Info);
                   //  if(j!=autor.length-1)
-                        formato  = formato+"; ";
+                    
+                    formato  = formato+"; ";
                   }
-                  
+               //   
               }    
         }
+        
+        
+        formato = formato.replaceAll(" ; ", "; ");
         //System.out.println(formato);
+       // System.out.println("Tamaño:"+formato.length());
+        //System.out.println("cantidad au:"+AutoresWoS.size());
         return formato;
     }
 
