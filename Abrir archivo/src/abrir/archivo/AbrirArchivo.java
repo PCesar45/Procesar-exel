@@ -78,13 +78,14 @@ public class AbrirArchivo {
         Abrir abrir = new Abrir();
         
 //        //API Universidades: http://universities.hipolabs.com/search?name=Universidad%20de%20Costa%20Rica
+          //API Paises:https://restcountries.com/v2/name/
 //        
-//        String link="http://universities.hipolabs.com/search?name=Pedro";
+        String link="https://restcountries.com/v2/name/Univ%20Costa%20Rica";
 //        URL url;
 //        try {
 //            url = new URL(link);
 //            HttpURLConnection http=(HttpURLConnection)url.openConnection();
-//            System.out.println(http.getContentLength());
+//            System.out.println(http.getResponseMessage());
 //        } catch (MalformedURLException ex) {
 //            Logger.getLogger(AbrirArchivo.class.getName()).log(Level.SEVERE, null, ex);
 //        } catch (IOException ex) {

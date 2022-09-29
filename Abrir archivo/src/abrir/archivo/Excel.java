@@ -13,7 +13,12 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import org.apache.poi.EncryptedDocumentException;
@@ -53,6 +58,7 @@ public class Excel {
     private static ArrayList<String> Conflictos;
     private static JTable tabla;
     private static DefaultTableModel modelo;
+    boolean Utec=false;
     //Botones de resolver conflictos
     //private static ArrayList<JButton> botones=new ArrayList<>();
     public Excel() {
@@ -196,9 +202,12 @@ public class Excel {
                                     contAutoresWoS++;
                                    // voy a separar la informacion por las comas
                                     String[] AuthorsWithAffDiv2 = AuthorsWithAffDiv1[i].split(", ");
-                                    
+                                    //Se identifica si la informacion se trata del TEC
+                                    Utec=AnalisisUTec(AuthorsWithAffDiv2);
                                     for (int j = 0; j < AuthorsWithAffDiv2.length; j++) {
+                                        
                                         String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
+                                        
                                         if(doc==Documento.scopus){
                                             //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
                                             if(AuthorsWithAffDiv2.length>=2){
@@ -235,28 +244,16 @@ public class Excel {
                                             Autor=AutoresWoS.get(contAutoresWoS);
                                            // System.out.println(contAutoresWoS);
                                         }
-                                        //Se identifica si la informacion se trata del TEC 
-                                        if(AnalisisUTec(AuthorsWithAffDivInfo)){
+                                         //si la informacion es del TEC
+                                        if(Utec){
+                                            
                                             //Escuela
                                             String resultadoEscuela=buscaEscuela(AuthorsWithAffDiv2);
-                                            
                                             if(!"No encontrado".equals(resultadoEscuela)){
                                                 Escuela=resultadoEscuela;
                                                // System.out.println(Escuela);
                                             }
                                             else{
-                                                //si no lo encuentra en la parte de la descripcion 
-                                                //lo busca en el titulo
-                                                String [] ttl={Titulo};
-                                                resultadoEscuela=buscaEscuela(ttl);
-                                                if(!"No encontrado".equals(resultadoEscuela)){
-                                                    Escuela=resultadoEscuela;
-                                                   // System.out.println(Escuela);
-                                                }
-                                                else{
-                                                    //System.out.println("Este no lo encuentra Escuela");
-                                                    //System.out.println(Codigo);
-                                                    //System.out.println(AuthorsWithAffDiv1[i]);
                                                    //Estos a excepciones 
                                                    Escuela="No encontrado";
                                                    ListaColumna[0]=Codigo;
@@ -265,7 +262,6 @@ public class Excel {
                                                    ListaColumna[3]="AutoresTEC";
                                                    modelo.addRow(ListaColumna);
                                                    ResolverConflictos(AuthorsWithAffDiv1[i]);
-                                                }
                                             }
                                             //Campus
                                             String resultadoCampus=buscaCampus(AuthorsWithAffDiv2);
@@ -310,15 +306,18 @@ public class Excel {
                                             Cell celda06=filaNueva.createCell(6);
                                             celda06.setCellValue(Pais);
                                             ContFilas++;
+                                            //necesario para evitar repetidos
+                                            break;
                                            // System.out.println(ContFilas);
                                         }else{//Autores externos
                                             //Analizar Universidad (API)
-                                            System.out.println(AuthorsWithAffDivInfo);
+                                           // System.out.println(AuthorsWithAffDiv1[i]);
                                             
                                             
                                             //Analizar Pais(API)
-                                            
-                                            
+                                            Pais=BuscaPais(AuthorsWithAffDiv2);
+                                            System.out.println(Pais);
+                                            break;
                                         }   
                                     }
                                 } 
@@ -411,38 +410,73 @@ public class Excel {
         
         return "No encontrado";
     } 
-    boolean AnalisisUTec(String Info){
-      //Convierte toda la info en minusculas 
-      Info=Info.toLowerCase();
-      //Si el nombre contiene Instituto y Costa Rica es TEC
-      if((Info.matches("(.*)instituto(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-          return true;
-      }
-      if((Info.matches("(.*)tecnologico(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-           return true;
-      }
-      if((Info.matches("(.*)tecnológico(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-           return true;
-      }
-      if((Info.matches("(.*)institute(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-           return true;
-      }
-      if((Info.matches("(.*)institute(.*)"))&&(Info.matches("(.*)costa rican(.*)"))){
-           return true;
-      }
-      if((Info.matches("(.*)technology(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-           return true;
-      }
-      //Casos WoS
-      if((Info.matches("(.*)ins(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-          return true;
-      }
-      if((Info.matches("(.*)tecnol(.*)"))&&(Info.matches("(.*)costa rica(.*)"))){
-          return true;
-      }
-      else{
-           return false; 
-      }
+    boolean AnalisisUTec(String[] InfoLinea){
+        
+        for (int i = 0; i < InfoLinea.length; i++) {
+            //Convierte toda la info en minusculas
+            InfoLinea[i]=InfoLinea[i].toLowerCase();
+            //Si el nombre contiene Instituto y Costa Rica es TEC
+            if((InfoLinea[i].matches("(.*)instituto(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                return true;
+            }
+            if((InfoLinea[i].matches("(.*)tecnologico(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                 return true;
+            }
+            if((InfoLinea[i].matches("(.*)tecnológico(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                 return true;
+            }
+            if((InfoLinea[i].matches("(.*)institute(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                 return true;
+            }
+            if((InfoLinea[i].matches("(.*)institute(.*)"))&&(InfoLinea[i].matches("(.*)costa rican(.*)"))){
+                 return true;
+            }
+            if((InfoLinea[i].matches("(.*)technology(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                 return true;
+            }
+            //Casos WoS
+            if((InfoLinea[i].matches("(.*)ins(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                return true;
+            }
+            if((InfoLinea[i].matches("(.*)inst(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                return true;
+            }
+            if((InfoLinea[i].matches("(.*)tecnol(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                return true;
+            }
+        }
+        return false; 
+     
+    }
+    String BuscaUexterna(String Info){
+        Info=Info.toLowerCase();
+        if(Info.matches("(.*)univ(.*)")){
+            return Info;
+        }
+        return "No encontrado";
+    }
+    String BuscaPais(String[] InfoLinea) throws MalformedURLException, IOException{
+        for (int i = 0; i < InfoLinea.length; i++) {
+            String pais=InfoLinea[i];
+            InfoLinea[i]=InfoLinea[i].replaceAll(" ", "%20");
+            //System.out.println(Info);
+            String link="https://restcountries.com/v2/name/"+InfoLinea[i]+"?fields=name";
+            URL url;
+            String Respuesta;
+            
+            url = new URL(link);
+            HttpURLConnection http=(HttpURLConnection)url.openConnection();
+                //System.out.println(http.getResponseMessage());
+            Respuesta=http.getResponseMessage();
+
+            
+            if("OK".equals(Respuesta)){
+                return pais;
+            }
+            
+        }
+        return "No encontrado";
+         
     }
     String buscaEscuela( String[] InfoFila){
       
@@ -452,66 +486,73 @@ public class Excel {
              if(InfoFila[i].equals(InfoFila[i].toUpperCase())&&(!InfoFila[i].matches("(.*)[.]"))){
                  return InfoFila[i];
              }
-            
-            
-             //Convierte toda la info en minusculas
-            String Info=InfoFila[i].toLowerCase();
-            //Si el nombre contiene escuela                                                                                                                   
-            
-            
-//            //preguntar por si solo espa;ol
-//            if((Info.matches("(.*)school(.*)"))||(Info.matches("(.*)department(.*)"))||(Info.matches("(.*)centre(.*)"))||(Info.matches("(.*)center(.*)"))||(Info.matches("(.*)lab(.*)"))||(Info.matches("(.*)laboratory(.*)"))||(Info.matches("(.*)engineering(.*)"))||(Info.matches("(.*)management(.*)"))){
-//                return InfoFila[i];
-//            }
-            if(Info.matches("(.*)Business(.*)")||(Info.matches("(.*)administración(.*)")&&(Info.matches("(.*)empresas(.*)")))
-               ||(Info.matches("(.*)administracion(.*)")&&(Info.matches("(.*)empresas(.*)")))||(Info.matches("(.*)ciadeg-tec(.*)"))
-                ||(Info.matches("(.*)adm empresas(.*)"))){
-                return "CIADEG-TEC";
+             //Convierte toda la info en minusculas 
+             String InfoFilaMinus=InfoFila[i].toLowerCase();
+             if(InfoFilaMinus.matches("(.*)ambiental y seguridad(.*)")||InfoFilaMinus.matches("(.*)ambiental & seguridad(.*)")||(InfoFilaMinus.matches("(.*)environmental(.*)")&&InfoFilaMinus.matches("(.*)safety(.*)"))){
+                return "GASEL";
+                
             }
-            if(Info.matches("(.*)biología(.*)")||(Info.matches("(.*)biologia(.*)"))||(Info.matches("(.*)biology(.*)"))
-              ||(Info.matches("(.*)biotecnología(.*)"))||(Info.matches("(.*)biotecnologia(.*)"))||(Info.matches("(.*)biotechnology(.*)"))||(Info.matches("(.*)biotech(.*)"))
-              ||(Info.matches("(.*)cib(.*)"))||(Info.matches("(.*)biotecnologia(.*)"))||(Info.matches("(.*)biol(.*)"))||(Info.matches("(.*)biotecnol(.*)"))
-                    ||(Info.matches("(.*)biotechnol(.*)"))||(Info.matches("(.*)biological(.*)"))||(Info.matches("(.*)biotechnological(.*)"))){
-                return "CIB";
-            }
-            if(Info.matches("(.*)inclutec(.*)")||Info.matches("(.*)computación(.*)")||Info.matches("(.*)computacion(.*)")
-               ||Info.matches("(.*)computer(.*)")||(Info.matches("(.*)comp(.*)"))||(Info.matches("(.*)cic(.*)"))){
-                return "CIC";
-            }
-            if(Info.matches("(.*)forestal(.*)")||(Info.matches("(.*)forestry(.*)"))
-                    ||(Info.matches("(.*)forest(.*)"))||(Info.matches("(.*)cif(.*)"))||(Info.matches("(.*)ecoplant(.*)"))){
-                return "CIF";
-            }
-            if(Info.matches("(.*)environmental protection(.*)")||(Info.matches("(.*)proteccion ambiental(.*)"))||(Info.matches("(.*)protección ambiental(.*)"))
-                ||(Info.matches("(.*)cipa(.*)"))||(Info.matches("(.*)ambiental(.*)"))){
+            if(InfoFilaMinus.matches("(.*)environmental protection(.*)")||(InfoFilaMinus.matches("(.*)proteccion ambiental(.*)"))||(InfoFilaMinus.matches("(.*)protección ambiental(.*)"))
+                ||(InfoFilaMinus.matches("(.*)cipa(.*)"))){
                 return "CIPA";
             }
-            if(Info.matches("(.*)construccion(.*)")||(Info.matches("(.*)construcción(.*)"))||(Info.matches("(.*)building(.*)"))
-                ||(Info.matches("(.*)vivienda(.*)"))||(Info.matches("(.*)dwelling(.*)"))||(Info.matches("(.*)structure(.*)"))
-                ||(Info.matches("(.*)civco(.*)")) ||(Info.matches("(.*)construcc(.*)"))){
-                return "CIVCO";
+            if(InfoFilaMinus.matches("(.*)administración(.*)")&&(InfoFilaMinus.matches("(.*)empresas(.*)"))||(InfoFilaMinus.matches("(.*)administracion(.*)")&&(InfoFilaMinus.matches("(.*)empresas(.*)")))
+                ||(InfoFilaMinus.matches("(.*)adm empresas(.*)"))){
+                    return "CIADEG-TEC";
             }
-            
-            if(Info.matches("(.*)quimica(.*)")||(Info.matches("(.*)química(.*)"))||(Info.matches("(.*)chemistry(.*)"))
-             ||(Info.matches("(.*)microbiologicos(.*)"))||(Info.matches("(.*)microbiológicos(.*)"))||(Info.matches("(.*)ceqiatec(.*)"))||(Info.matches("(.*)quim(.*)"))){
-                return "CEQIATEC";
-            }
-            if(Info.matches("(.*)agroindustrial(.*)")||(Info.matches("(.*)agronegocios(.*)"))||(Info.matches("(.*)agribusiness(.*)"))
-                ||(Info.matches("(.*)ciga(.*)"))){
-                return "CIGA";
-            }
-            if(Info.matches("(.*)agronomia(.*)")||(Info.matches("(.*)agronomía(.*)"))||(Info.matches("(.*)agronomıa(.*)"))
-                ||(Info.matches("(.*)agronomy(.*)"))||(Info.matches("(.*)agr(.*)"))||(Info.matches("(.*)agricultural(.*)"))
-                ||(Info.matches("(.*)cidasth(.*)"))||(Info.matches("(.*)plantations(.*)"))){
-                return "CIDASTH";
-            }
-            if(Info.matches("(.*)materiales(.*)")||(Info.matches("(.*)material(.*)"))||(Info.matches("(.*)materials(.*)"))||(Info.matches("(.*)ciemtec(.*)"))){
-                return "CIEMTEC";
-            }
-            
-            if(Info.matches("(.*)ciencias naturales(.*)")||(Info.matches("(.*)doctorado(.*)"))||(Info.matches("(.*)zootecnia(.*)"))
-                    ||(Info.matches("(.*)natural sciences(.*)"))||(Info.matches("(.*)animal husbandry(.*)"))||(Info.matches("(.*)docinade(.*)"))){
+            if(InfoFilaMinus.matches("(.*)ciencias naturales(.*)")||InfoFilaMinus.matches("(.*)natural sciences(.*)")||InfoFilaMinus.matches("(.*)animal husbandry(.*)")){
                 return "DOCINADE";
+            }
+            
+             //la infomarcion separa por los espacios
+            String[] Info=InfoFilaMinus.split(" ");
+            
+            for (int j = 0; j < Info.length; j++) {
+                if(Info[j].matches("business")||(Info[j].matches("ciadeg-tec"))){
+                    return "CIADEG-TEC";
+                }
+                if(Info[j].matches("biología")||(Info[j].matches("biologia"))||(Info[j].matches("biology"))
+                  ||(Info[j].matches("biotecnología"))||(Info[j].matches("biotecnologia"))||(Info[j].matches("biotechnology"))||(Info[j].matches("biotech"))
+                  ||(Info[j].matches("cib"))||(Info[j].matches("biotecnologia"))||(Info[j].matches("biol"))||(Info[j].matches("biotecnol"))
+                        ||(Info[j].matches("biotechnol"))||(Info[j].matches("biological"))||(Info[j].matches("biotechnological"))){
+                    return "CIB";
+                }
+                if(Info[j].matches("inclutec")||Info[j].matches("computación")||Info[j].matches("computacion")
+                   ||Info[j].matches("computer")||(Info[j].matches("comp"))||(Info[j].matches("cic"))){
+                    return "CIC";
+                }
+                
+                if(Info[j].matches("construccion")||(Info[j].matches("construcción"))||(Info[j].matches("building"))
+                    ||(Info[j].matches("vivienda"))||(Info[j].matches("dwelling"))||(Info[j].matches("structure"))
+                    ||(Info[j].matches("civco")) ||(Info[j].matches("construcc"))){
+                    return "CIVCO";
+                }
+
+                if(Info[j].matches("quimica")||(Info[j].matches("química"))||(Info[j].matches("chemistry"))
+                 ||(Info[j].matches("microbiologicos"))||(Info[j].matches("microbiológicos"))||(Info[j].matches("ceqiatec"))||(Info[j].matches("quim"))){
+                    return "CEQIATEC";
+                }
+                if(Info[j].matches("agroindustrial")||(Info[j].matches("agronegocios"))||(Info[j].matches("agribusiness"))||(Info[j].matches("agroforestry"))
+                    ||(Info[j].matches("agroforestal"))||(Info[j].matches("ciga"))){
+                    return "CIGA";
+                }
+                if(Info[j].matches("forestal")||(Info[j].matches("forestry"))
+                        ||(Info[j].matches("forest"))||(Info[j].matches("cif"))||(Info[j].matches("ecoplant"))){
+                    return "CIF";
+                }
+                if(Info[j].matches("agronomia")||(Info[j].matches("agronomía"))||(Info[j].matches("agronomıa"))
+                    ||(Info[j].matches("agronomy"))||(Info[j].matches("agr"))||(Info[j].matches("agricultural"))
+                    ||(Info[j].matches("cidasth"))||(Info[j].matches("plantations"))){
+                    return "CIDASTH";
+                }
+                if(Info[j].matches("materiales")||(Info[j].matches("material"))||(Info[j].matches("materials"))||(Info[j].matches("ciemtec"))){
+                    return "CIEMTEC";
+                }
+
+                if((Info[j].matches("doctorado"))||(Info[j].matches("zootecnia"))||(Info[j].matches("docinade"))){
+                    return "DOCINADE";
+                }
+                
             }
             
              //\\buscar siglas entre parentesis
@@ -528,24 +569,22 @@ public class Excel {
                      return siglas;
                  }
                  
-             }
-            if(Info.matches("(.*)mechatronics(.*)")||(Info.matches("(.*)mecatron(.*)"))){
-                return "Area Académica de Ingeniería en Mecatrónica";
             }
-            //Si no encuentra la Unidad de investigacion pone la escula
-            if(Info.matches("(.*)escuela(.*)")||(Info.matches("(.*)area(.*)"))||(Info.matches("(.*)unidad(.*)"))||(Info.matches("(.*)centro(.*)"))){
-                return InfoFila[i];
-            }
-            if(Info.matches("(.*)carrera(.*)")||(Info.matches("(.*)laboratorio(.*)"))){
-                return InfoFila[i];
-            }
-            
-            
-            
-            
-           
+            for (int j = 0; j < Info.length; j++) {
+                if(Info[j].matches("mechatronics")||(Info[j].matches("mecatron"))){
+                    return "Area Académica de Ingeniería en Mecatrónica";
+                }
+                //Si no encuentra la Unidad de investigacion pone la escula
+                if(Info[j].matches("escuela")||(Info[j].matches("area"))||(Info[j].matches("unidad"))||(Info[j].matches("centro"))){
+                    return InfoFila[i];
+                }
+                if(Info[j].matches("carrera")||(Info[j].matches("laboratorio"))){
+                    return InfoFila[i];
+                }
+                
+            }      
         }
-         return "No encontrado"; 
+        return "No encontrado"; 
     }
     String buscaCampus( String[] InfoFila){
       
