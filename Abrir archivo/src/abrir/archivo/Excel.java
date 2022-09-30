@@ -52,7 +52,7 @@ public class Excel {
     private String Campus;
     private String Universidad;
     private String Pais;
-    private  ArrayList<String> AutoresWoS=new ArrayList<>();;
+    private  ArrayList<String> AutoresWoS=new ArrayList<>();
     //Va a guardar la informacion de Authors with affiliations separada por comas
     //private String[] AuthorsWithAffDiv;
     private static ArrayList<String> Conflictos;
@@ -458,26 +458,33 @@ public class Excel {
     String BuscaPais(String[] InfoLinea) throws MalformedURLException, IOException{
         for (int i = 0; i < InfoLinea.length; i++) {
             String pais=InfoLinea[i];
-            InfoLinea[i]=InfoLinea[i].replaceAll(" ", "%20");
-            //System.out.println(Info);
-            String link="https://restcountries.com/v2/name/"+InfoLinea[i]+"?fields=name";
-            URL url;
-            String Respuesta;
+            pais=pais.toLowerCase();
             
-            url = new URL(link);
-            HttpURLConnection http=(HttpURLConnection)url.openConnection();
-                //System.out.println(http.getResponseMessage());
-            Respuesta=http.getResponseMessage();
-
-            
-            if("OK".equals(Respuesta)){
-                return pais;
+            //asegurar que la primer letra del pais sea mayuscula
+            pais=pais.replaceFirst(String.valueOf(pais.charAt(0)),String.valueOf(pais.charAt(0)).toUpperCase());
+            //Si el pais se conforma de mas letras
+            if(pais.contains(" ")){
+                String[] separaciones=pais.split(" ");
+                pais="";
+                for (int j = 0; j < separaciones.length; j++) {
+                    if(!"".equals(separaciones[j])){
+                        pais+=separaciones[j].replaceFirst(String.valueOf(separaciones[j].charAt(0)),String.valueOf(separaciones[j].charAt(0)).toUpperCase());
+                        if(j!=separaciones.length-1)
+                            pais+=" ";
+                    }
+                }
+                
+               
             }
-            
+            if(Paises.getPaises().contains(pais)){
+                return pais;
+            } 
         }
+        
         return "No encontrado";
          
     }
+    
     String buscaEscuela( String[] InfoFila){
       
         for (int i = 0; i < InfoFila.length; i++) {
@@ -564,7 +571,7 @@ public class Excel {
                  //System.out.println(siglas);
                  //Este es muy especifico 
                  if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
-                    ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)){
+                    ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)||"GASEL".equals(siglas)){
                     // System.out.println("Reconocida");
                      return siglas;
                  }

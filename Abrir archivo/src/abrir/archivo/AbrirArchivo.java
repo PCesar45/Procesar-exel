@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +30,7 @@ public class AbrirArchivo {
     /**
      * @param args the command line arguments
      */
+    
     public static void main(String[] args) {
         //Aparencia 
          try{
@@ -35,6 +38,7 @@ public class AbrirArchivo {
         } catch(Exception e){
             System.out.println(e);
         }
+         
         //System.out.println("DOCINADE".equals("DOCINADE".toUpperCase()));
         //System.out.println("DOCINADE".matches("[A-Z]"));
         //System.out.println("Ó.A.".matches("[Á-Ú].*"));
@@ -73,14 +77,20 @@ public class AbrirArchivo {
 //            String siglas=A[1].substring(Par1+1, Par2);
 //            System.out.println(siglas);
 //        }
+  
+        
        
+
+       
+        Paises.CrearListaPaises();
+        
         
         Abrir abrir = new Abrir();
         
 //        //API Universidades: http://universities.hipolabs.com/search?name=Universidad%20de%20Costa%20Rica
           //API Paises:https://restcountries.com/v2/name/
 //        
-        String link="https://restcountries.com/v2/name/Univ%20Costa%20Rica";
+//        String link="https://restcountries.com/v2/name/Univ%20Costa%20Rica";
 //        URL url;
 //        try {
 //            url = new URL(link);
