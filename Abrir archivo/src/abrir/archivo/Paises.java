@@ -17,9 +17,9 @@ import java.util.logging.Logger;
  * @author Pablo
  */
 public class Paises {
-    private static ArrayList<String> paises=new ArrayList<>();;
+    private static final ArrayList<String> paises=new ArrayList<>();
     public static void CrearListaPaises(){
-        File myObj = new File("Paises en ingles,espanol,frances y portugues.txt");
+        File myObj = new File("Paises en ing,es,fr y pt.txt");
         Scanner sc;
         try {
             sc = new Scanner(myObj);

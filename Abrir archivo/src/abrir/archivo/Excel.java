@@ -495,69 +495,31 @@ public class Excel {
              }
              //Convierte toda la info en minusculas 
              String InfoFilaMinus=InfoFila[i].toLowerCase();
-             if(InfoFilaMinus.matches("(.*)ambiental y seguridad(.*)")||InfoFilaMinus.matches("(.*)ambiental & seguridad(.*)")||(InfoFilaMinus.matches("(.*)environmental(.*)")&&InfoFilaMinus.matches("(.*)safety(.*)"))){
-                return "GASEL";
+             //frases claves
+             for (int j = 0; j < Unidades.getFrasesClave().size(); j++) {
+                 for (int k = 0; k < Unidades.getFrasesClave().get(j).length; k++) {
+                    if(InfoFilaMinus.matches("(.*)"+Unidades.getFrasesClave().get(j)[k]+"(.*)")){
+                        return Unidades.getFrasesClave().get(j)[0];
+                    }
+                     
+                 }
+               
                 
             }
-            if(InfoFilaMinus.matches("(.*)environmental protection(.*)")||(InfoFilaMinus.matches("(.*)proteccion ambiental(.*)"))||(InfoFilaMinus.matches("(.*)protección ambiental(.*)"))
-                ||(InfoFilaMinus.matches("(.*)cipa(.*)"))){
-                return "CIPA";
-            }
-            if(InfoFilaMinus.matches("(.*)administración(.*)")&&(InfoFilaMinus.matches("(.*)empresas(.*)"))||(InfoFilaMinus.matches("(.*)administracion(.*)")&&(InfoFilaMinus.matches("(.*)empresas(.*)")))
-                ||(InfoFilaMinus.matches("(.*)adm empresas(.*)"))){
-                    return "CIADEG-TEC";
-            }
-            if(InfoFilaMinus.matches("(.*)ciencias naturales(.*)")||InfoFilaMinus.matches("(.*)natural sciences(.*)")||InfoFilaMinus.matches("(.*)animal husbandry(.*)")){
-                return "DOCINADE";
-            }
+            
             
              //la infomarcion separa por los espacios
             String[] Info=InfoFilaMinus.split(" ");
-            
+            //palabras clave
             for (int j = 0; j < Info.length; j++) {
-                if(Info[j].matches("business")||(Info[j].matches("ciadeg-tec"))){
-                    return "CIADEG-TEC";
-                }
-                if(Info[j].matches("biología")||(Info[j].matches("biologia"))||(Info[j].matches("biology"))
-                  ||(Info[j].matches("biotecnología"))||(Info[j].matches("biotecnologia"))||(Info[j].matches("biotechnology"))||(Info[j].matches("biotech"))
-                  ||(Info[j].matches("cib"))||(Info[j].matches("biotecnologia"))||(Info[j].matches("biol"))||(Info[j].matches("biotecnol"))
-                        ||(Info[j].matches("biotechnol"))||(Info[j].matches("biological"))||(Info[j].matches("biotechnological"))){
-                    return "CIB";
-                }
-                if(Info[j].matches("inclutec")||Info[j].matches("computación")||Info[j].matches("computacion")
-                   ||Info[j].matches("computer")||(Info[j].matches("comp"))||(Info[j].matches("cic"))){
-                    return "CIC";
-                }
-                
-                if(Info[j].matches("construccion")||(Info[j].matches("construcción"))||(Info[j].matches("building"))
-                    ||(Info[j].matches("vivienda"))||(Info[j].matches("dwelling"))||(Info[j].matches("structure"))
-                    ||(Info[j].matches("civco")) ||(Info[j].matches("construcc"))){
-                    return "CIVCO";
-                }
-
-                if(Info[j].matches("quimica")||(Info[j].matches("química"))||(Info[j].matches("chemistry"))
-                 ||(Info[j].matches("microbiologicos"))||(Info[j].matches("microbiológicos"))||(Info[j].matches("ceqiatec"))||(Info[j].matches("quim"))){
-                    return "CEQIATEC";
-                }
-                if(Info[j].matches("agroindustrial")||(Info[j].matches("agronegocios"))||(Info[j].matches("agribusiness"))||(Info[j].matches("agroforestry"))
-                    ||(Info[j].matches("agroforestal"))||(Info[j].matches("ciga"))){
-                    return "CIGA";
-                }
-                if(Info[j].matches("forestal")||(Info[j].matches("forestry"))
-                        ||(Info[j].matches("forest"))||(Info[j].matches("cif"))||(Info[j].matches("ecoplant"))){
-                    return "CIF";
-                }
-                if(Info[j].matches("agronomia")||(Info[j].matches("agronomía"))||(Info[j].matches("agronomıa"))
-                    ||(Info[j].matches("agronomy"))||(Info[j].matches("agr"))||(Info[j].matches("agricultural"))
-                    ||(Info[j].matches("cidasth"))||(Info[j].matches("plantations"))){
-                    return "CIDASTH";
-                }
-                if(Info[j].matches("materiales")||(Info[j].matches("material"))||(Info[j].matches("materials"))||(Info[j].matches("ciemtec"))){
-                    return "CIEMTEC";
-                }
-
-                if((Info[j].matches("doctorado"))||(Info[j].matches("zootecnia"))||(Info[j].matches("docinade"))){
-                    return "DOCINADE";
+                for (int k = 0; k < Unidades.getPalabrasClave().size(); k++) {
+                    for (int l = 0; l < Unidades.getPalabrasClave().get(k).length; l++) {
+                       if(Unidades.getPalabrasClave().get(k)[l].equals(Info[j])){
+                           System.out.println(Unidades.getPalabrasClave().get(k)[0]);
+                           return Unidades.getPalabrasClave().get(k)[0];
+                       }
+                        
+                    }
                 }
                 
             }
@@ -578,9 +540,6 @@ public class Excel {
                  
             }
             for (int j = 0; j < Info.length; j++) {
-                if(Info[j].matches("mechatronics")||(Info[j].matches("mecatron"))){
-                    return "Area Académica de Ingeniería en Mecatrónica";
-                }
                 //Si no encuentra la Unidad de investigacion pone la escula
                 if(Info[j].matches("escuela")||(Info[j].matches("area"))||(Info[j].matches("unidad"))||(Info[j].matches("centro"))){
                     return InfoFila[i];
