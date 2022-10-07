@@ -190,7 +190,7 @@ public class Excel {
                                 //Si se trata de Wos aqui se le dara el mismo formato que Scopus
                                
                                 if(doc==Documento.WoS){
-                                  //   System.out.println(AuthorsWithAff);
+                                     
                                      AuthorsWithAff=DarFormato(AuthorsWithAff);
                                 }
                                 //Aqui se va a analizar y separar la columan de Authors with affiliations
@@ -203,14 +203,18 @@ public class Excel {
                                    // voy a separar la informacion por las comas
                                     String[] AuthorsWithAffDiv2 = AuthorsWithAffDiv1[i].split(", ");
                                     //Se identifica si la informacion se trata del TEC
+                                    
                                     Utec=AnalisisUTec(AuthorsWithAffDiv2);
+                                    //System.out.println(Arrays.toString(AuthorsWithAffDiv2));
                                     for (int j = 0; j < AuthorsWithAffDiv2.length; j++) {
                                         
                                         String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
                                         
                                         if(doc==Documento.scopus){
                                             //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
+                                           
                                             if(AuthorsWithAffDiv2.length>=2){
+                                                 //System.out.println(AuthorsWithAffDiv2[0]+","+AuthorsWithAffDiv2[1]);
                                                 if(!"No encontrado".equals(AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
                                                     Autor=AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
                                                 }else{//en caso de que no lo encuentre lo busca en toda la linea 
@@ -310,13 +314,15 @@ public class Excel {
                                             break;
                                            // System.out.println(ContFilas);
                                         }else{//Autores externos
-                                            //Analizar Universidad (API)
-                                           // System.out.println(AuthorsWithAffDiv1[i]);
+                                            
+                                            // System.out.println(AuthorsWithAffDiv1[i]);
                                             
                                             
-                                            //Analizar Pais(API)
+                                            //Analizar Pais
                                             Pais=BuscaPais(AuthorsWithAffDiv2);
-                                            System.out.println(Pais);
+                                            //Buscar Universidad
+                                            Universidad=BuscarU(AuthorsWithAffDiv2);
+                                            System.out.println(Universidad);
                                             break;
                                         }   
                                     }
@@ -410,8 +416,9 @@ public class Excel {
         
         return "No encontrado";
     } 
-    boolean AnalisisUTec(String[] InfoLinea){
-        
+    boolean AnalisisUTec(String[] InfoLinea1){
+        String [] InfoLinea=InfoLinea1.clone();
+   
         for (int i = 0; i < InfoLinea.length; i++) {
             //Convierte toda la info en minusculas
             InfoLinea[i]=InfoLinea[i].toLowerCase();
@@ -448,13 +455,7 @@ public class Excel {
         return false; 
      
     }
-    String BuscaUexterna(String Info){
-        Info=Info.toLowerCase();
-        if(Info.matches("(.*)univ(.*)")){
-            return Info;
-        }
-        return "No encontrado";
-    }
+  
     String BuscaPais(String[] InfoLinea) throws MalformedURLException, IOException{
         for (int i = 0; i < InfoLinea.length; i++) {
             String pais=InfoLinea[i];
@@ -468,7 +469,9 @@ public class Excel {
                 pais="";
                 for (int j = 0; j < separaciones.length; j++) {
                     if(!"".equals(separaciones[j])){
-                        pais+=separaciones[j].replaceFirst(String.valueOf(separaciones[j].charAt(0)),String.valueOf(separaciones[j].charAt(0)).toUpperCase());
+                        String str =separaciones[j].replaceAll("\\)", "");
+                        String str2 =str.replaceAll("\\(", "");
+                        pais+=separaciones[j].replaceFirst(String.valueOf(str2.charAt(0)),String.valueOf(str2.charAt(0)).toUpperCase());
                         if(j!=separaciones.length-1)
                             pais+=" ";
                     }
@@ -483,6 +486,37 @@ public class Excel {
         
         return "No encontrado";
          
+    }
+    String BuscarU(String[] InfoLinea) {
+        for (int i = 0; i < InfoLinea.length; i++) {
+            String Uni=InfoLinea[i];
+            Uni=Uni.toLowerCase();
+            //Universadades nacionales
+            for (int j = 0; j < Universidades.getUNacional().length; j++) {
+                Uni=Uni.replaceAll("\\)", "");
+                Uni=Uni.replaceAll("\\(", "");
+                //Paraque no pnga en la Universidad el pais
+                if(InfoLinea[i] == null ? Pais != null : !InfoLinea[i].equals(Pais)){
+                    if(Universidades.getUNacional()[j].matches("(.*)"+Uni+"(.*)")&&(Uni.length()>4)){
+                        return InfoLinea[i];
+                    }
+                        
+                }
+            }
+             //Universadades Internacionales
+            for (int j = 0; j < Universidades.getUInternacional().length; j++) {
+                //Paraque no pnga en la Universidad el pais
+                if(InfoLinea[i] == null ? Pais != null : !InfoLinea[i].equals(Pais)){
+                    
+                    if(Universidades.getUInternacional()[j].matches("(.*)"+Uni+"(.*)")&&(Uni.length()>34)){
+                        return InfoLinea[i];
+                    }
+                        
+                }
+                
+            }
+        }
+        return "No encontrado";
     }
     
     String buscaEscuela( String[] InfoFila){
@@ -515,7 +549,7 @@ public class Excel {
                 for (int k = 0; k < Unidades.getPalabrasClave().size(); k++) {
                     for (int l = 0; l < Unidades.getPalabrasClave().get(k).length; l++) {
                        if(Unidades.getPalabrasClave().get(k)[l].equals(Info[j])){
-                           System.out.println(Unidades.getPalabrasClave().get(k)[0]);
+                           //m.out.println(Unidades.getPalabrasClave().get(k)[0]);
                            return Unidades.getPalabrasClave().get(k)[0];
                        }
                         

@@ -29,7 +29,7 @@ public class Paises {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AbrirArchivo.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(paises.contains("Georgia"));
+        //System.out.println(paises.contains("Georgia"));
     } 
 
     public static ArrayList<String> getPaises() {

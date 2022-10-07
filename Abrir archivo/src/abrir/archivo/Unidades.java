@@ -44,10 +44,6 @@ public class Unidades{
           } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
          }
-         for (int i = 0; i < FrasesClave.size(); i++) {
-             System.out.println(Arrays.toString(FrasesClave.get(i)));
-             
-         }
     }
     public static ArrayList<String[]> getPalabrasClave() {
         return PalabrasClave;

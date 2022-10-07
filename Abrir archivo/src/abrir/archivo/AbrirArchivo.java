@@ -85,7 +85,8 @@ public class AbrirArchivo {
         Paises.CrearListaPaises();
         Unidades.CrearListaPalabrasClave();
         Unidades.CrearListafrasesClave();
-        
+        Universidades.CrearListaUinternacional();
+        Universidades.CrearListaUnacional();
         
         Abrir abrir = new Abrir();
         
