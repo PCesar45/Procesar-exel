@@ -322,7 +322,9 @@ public class Excel {
                                             Pais=BuscaPais(AuthorsWithAffDiv2);
                                             //Buscar Universidad
                                             Universidad=BuscarU(AuthorsWithAffDiv2);
-                                            System.out.println(Universidad);
+                                            if(Pais=="No encontrado"){
+                                                System.out.println(AuthorsWithAffDiv1[i]);
+                                            }
                                             break;
                                         }   
                                     }
@@ -489,29 +491,38 @@ public class Excel {
     }
     String BuscarU(String[] InfoLinea) {
         for (int i = 0; i < InfoLinea.length; i++) {
-            String Uni=InfoLinea[i];
-            Uni=Uni.toLowerCase();
+            String infoMinus=InfoLinea[i].toLowerCase();
+            if(infoMinus.charAt(0)==' '){
+                infoMinus=infoMinus.replaceFirst(" ", "");
+            }
+            if(infoMinus.matches("(.*)univ(.*)")||infoMinus.matches("(.*)inst(.*)")||infoMinus.matches("(.*)cent(.*)")
+                ||infoMinus.matches("(.*)nacional(.*)")||infoMinus.matches("(.*)national(.*)")||infoMinus.matches("(.*)ctr(.*)")||infoMinus.matches("(.*)col(.*)")){
+                return InfoLinea[i];
+            }
+            
+            
+            
             //Universadades nacionales
             for (int j = 0; j < Universidades.getUNacional().length; j++) {
-                Uni=Uni.replaceAll("\\)", "");
-                Uni=Uni.replaceAll("\\(", "");
                 //Paraque no pnga en la Universidad el pais
-                if(InfoLinea[i] == null ? Pais != null : !InfoLinea[i].equals(Pais)){
-                    if(Universidades.getUNacional()[j].matches("(.*)"+Uni+"(.*)")&&(Uni.length()>4)){
+                if(InfoLinea[i] == null ? Pais != null : !InfoLinea[i].equals(Pais)){                  
+                    String str=infoMinus.replaceAll("\\)", "");
+                    str=str.replaceAll("\\(", "");
+                    if(Universidades.getUNacional()[j].toLowerCase().matches(str)&&(!str.matches("(.*)[.]"))){
                         return InfoLinea[i];
                     }
-                        
+                          
                 }
             }
              //Universadades Internacionales
             for (int j = 0; j < Universidades.getUInternacional().length; j++) {
                 //Paraque no pnga en la Universidad el pais
                 if(InfoLinea[i] == null ? Pais != null : !InfoLinea[i].equals(Pais)){
-                    
-                    if(Universidades.getUInternacional()[j].matches("(.*)"+Uni+"(.*)")&&(Uni.length()>34)){
+                    String str=infoMinus.replaceAll("\\)", "");
+                    str=str.replaceAll("\\(", "");
+                    if(Universidades.getUInternacional()[j].toLowerCase().matches(str)&&(!str.matches("(.*)[.]"))){
                         return InfoLinea[i];
-                    }
-                        
+                    }   
                 }
                 
             }
