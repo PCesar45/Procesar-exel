@@ -38,6 +38,7 @@ public class Excel {
     private static XSSFWorkbook book;
     
     private static XSSFWorkbook book2;
+//   private static XSSFWorkbook book3;
     private int columnaCodigo;
     private int columnaTitulo;
     private int columnaAuthorsWithAff;
@@ -83,23 +84,12 @@ public class Excel {
        modelo.addColumn("Excel");
        modelo.addColumn("Resolver");
         
-        Sheet hojaGuardar = book2.createSheet("AutoresTEC");
+        Sheet hojaGuardarTEC = book2.createSheet("AutoresTEC");
         //nombres de las columnas del excel nuevo
-        Row fila1=hojaGuardar.createRow(0);
-        Cell celda0=fila1.createCell(0);
-        celda0.setCellValue("EID");
-        Cell celda1=fila1.createCell(1);
-        celda1.setCellValue("Title");
-        Cell celda2=fila1.createCell(2);
-        celda2.setCellValue("Autores");
-        Cell celda3=fila1.createCell(3);
-        celda3.setCellValue("Unidad de investigación");
-        Cell celda4=fila1.createCell(4);
-        celda4.setCellValue("Campus");
-        Cell celda5=fila1.createCell(5);
-        celda5.setCellValue("Universidad");
-        Cell celda6=fila1.createCell(6);
-        celda6.setCellValue("Pais");
+        TitulosColTEC(hojaGuardarTEC);
+        Sheet hojaGuardarInter= book2.createSheet("Autores Internacionales");
+        TitulosColExter(hojaGuardarInter);
+        
 
         
         try {
@@ -112,7 +102,8 @@ public class Excel {
             int cont=0;
              int contAutoresWoS=-1;
             int IndiceFila=-1;
-            int ContFilas=1;
+            int ContFilasTEC=1;
+            int ContFilasExtern=1;
             //VA SER VERDADERO SI EXISTEN FILAS POR RECORRER
             while (FilaIterator.hasNext()) {                
                 //INDICE FILA AUMENTA 1 POR CADA RECORRIDO
@@ -223,13 +214,15 @@ public class Excel {
                                                     }
                                                     else{
                                                        // si del todo no lo encuentra  lo mandaria a excepciones 
-                                                       Autor="No encontrado";
-                                                       ListaColumna[0]=Codigo;
-                                                       ListaColumna[1]=ContFilas+1;
-                                                       ListaColumna[2]="Autor";
-                                                       ListaColumna[3]="AutoresTEC";
-                                                       modelo.addRow(ListaColumna);
-                                                       ResolverConflictos(AuthorsWithAffDiv1[i]);
+                                                      Autor="No encontrado";
+                                                      if(Utec){
+                                                           añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AuthorsWithAffDiv1[i]);
+                                                      }
+                                                      else{
+                                                          añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","Autores Internacionales",AuthorsWithAffDiv1[i]);
+                                                      }
+                                                      
+                                                      
                                                        // System.out.println("Este no lo encuentra");
                                                         //System.out.println(AuthorsWithAffDiv1[i]);
                                                     }
@@ -260,12 +253,8 @@ public class Excel {
                                             else{
                                                    //Estos a excepciones 
                                                    Escuela="No encontrado";
-                                                   ListaColumna[0]=Codigo;
-                                                   ListaColumna[1]=ContFilas+1;
-                                                   ListaColumna[2]="Escuela o Unidad";
-                                                   ListaColumna[3]="AutoresTEC";
-                                                   modelo.addRow(ListaColumna);
-                                                   ResolverConflictos(AuthorsWithAffDiv1[i]);
+                                                   //System.out.println(AuthorsWithAffDiv1[i]);
+                                                   añadirConflicto(ListaColumna,ContFilasTEC+1,"Escuela o Unidad","AutoresTEC",AuthorsWithAffDiv1[i]);
                                             }
                                             //Campus
                                             String resultadoCampus=buscaCampus(AuthorsWithAffDiv2);
@@ -279,12 +268,8 @@ public class Excel {
                                                  //System.out.println(AuthorsWithAffDiv1[i]);
                                                 //Estos a excepciones 
                                                 Campus="No encontrado";
-                                                ListaColumna[0]=Codigo;
-                                                ListaColumna[1]=ContFilas+1;
-                                                ListaColumna[2]="Campus";
-                                                ListaColumna[3]="AutoresTEC";
-                                                modelo.addRow(ListaColumna);
-                                                ResolverConflictos(AuthorsWithAffDiv1[i]);
+                                                
+                                                añadirConflicto(ListaColumna,ContFilasTEC+1,"Campus","AutoresTEC",AuthorsWithAffDiv1[i]);
                                             }
                                             //Universidad y Pais autores TEC son fijos
                                             Universidad="Instituto Tecnologico de Costa Rica";
@@ -293,26 +278,12 @@ public class Excel {
                                            // System.out.println(Autor);
                                             
                                             //TEC:System.out.println(AuthorsWithAffDivInfo) 
-                                            //System.out.println(ContFilas);
-                                            Row filaNueva=hojaGuardar.createRow(ContFilas);
-                                            Cell celda00=filaNueva.createCell(0);
-                                            celda00.setCellValue(Codigo);
-                                            Cell celda01=filaNueva.createCell(1);
-                                            celda01.setCellValue(Titulo);
-                                            Cell celda02=filaNueva.createCell(2);
-                                            celda02.setCellValue(Autor);
-                                            Cell celda03=filaNueva.createCell(3);
-                                            celda03.setCellValue(Escuela);
-                                            Cell celda04=filaNueva.createCell(4);
-                                            celda04.setCellValue(Campus);
-                                            Cell celda05=filaNueva.createCell(5);
-                                            celda05.setCellValue(Universidad);
-                                            Cell celda06=filaNueva.createCell(6);
-                                            celda06.setCellValue(Pais);
-                                            ContFilas++;
+                                            //System.out.println(ContFilasTEC);
+                                            GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
+                                            ContFilasTEC++;
                                             //necesario para evitar repetidos
                                             break;
-                                           // System.out.println(ContFilas);
+                                           // System.out.println(ContFilasTEC);
                                         }else{//Autores externos
                                             
                                             // System.out.println(AuthorsWithAffDiv1[i]);
@@ -320,11 +291,17 @@ public class Excel {
                                             
                                             //Analizar Pais
                                             Pais=BuscaPais(AuthorsWithAffDiv2);
+                                            if("No encontrado".equals(Pais)){
+                                                añadirConflicto(ListaColumna,ContFilasTEC+1,"País","Autores Internacionales",AuthorsWithAffDiv1[i]);
+                                            }
                                             //Buscar Universidad
                                             Universidad=BuscarU(AuthorsWithAffDiv2);
-                                            if(Pais=="No encontrado"){
-                                                System.out.println(AuthorsWithAffDiv1[i]);
+                                            if("No encontrado".equals(Universidad)){
+                                                 añadirConflicto(ListaColumna,ContFilasTEC+1,"Universidad","Autores Internacionales",AuthorsWithAffDiv1[i]);
                                             }
+                                            GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
+                                            ContFilasExtern++;
+                                            
                                             break;
                                         }   
                                     }
@@ -370,6 +347,74 @@ public class Excel {
 //            }
 //        
 //    }
+    public void GuardarFilaAuTEC(Sheet hoja,int fila){
+        Row filaNueva=hoja.createRow(fila);
+        Cell celda00=filaNueva.createCell(0);
+        celda00.setCellValue(Codigo);
+        Cell celda01=filaNueva.createCell(1);
+        celda01.setCellValue(Titulo);
+        Cell celda02=filaNueva.createCell(2);
+        celda02.setCellValue(Autor);
+        Cell celda03=filaNueva.createCell(3);
+        celda03.setCellValue(Escuela);
+        Cell celda04=filaNueva.createCell(4);
+        celda04.setCellValue(Campus);
+        Cell celda05=filaNueva.createCell(5);
+        celda05.setCellValue(Universidad);
+        Cell celda06=filaNueva.createCell(6);
+        celda06.setCellValue(Pais);
+    } 
+    public void GuardarFilaAuExtern(Sheet hoja,int fila){
+        Row filaNueva=hoja.createRow(fila);
+        Cell celda00=filaNueva.createCell(0);
+        celda00.setCellValue(Codigo);
+        Cell celda01=filaNueva.createCell(1);
+        celda01.setCellValue(Titulo);
+        Cell celda02=filaNueva.createCell(2);
+        celda02.setCellValue(Autor);
+        Cell celda03=filaNueva.createCell(3);
+        celda03.setCellValue(Universidad);
+        Cell celda04=filaNueva.createCell(4);
+        celda04.setCellValue(Pais);
+    }
+    public void añadirConflicto(Object[]ListaColumna,int Fila,String Tipo,String excel,String Info){
+        ListaColumna[0]=Codigo;
+        ListaColumna[1]=Fila;
+        ListaColumna[2]=Tipo;
+        ListaColumna[3]=excel;
+        modelo.addRow(ListaColumna);
+        ResolverConflictos(Info);
+    }
+    public void TitulosColTEC(Sheet hoja){
+        Row fila1=hoja.createRow(0);
+        Cell celda0=fila1.createCell(0);
+        celda0.setCellValue("Código");
+        Cell celda1=fila1.createCell(1);
+        celda1.setCellValue("Titulo");
+        Cell celda2=fila1.createCell(2);
+        celda2.setCellValue("Autor");
+        Cell celda3=fila1.createCell(3);
+        celda3.setCellValue("Unidad de investigación");
+        Cell celda4=fila1.createCell(4);
+        celda4.setCellValue("Campus");
+        Cell celda5=fila1.createCell(5);
+        celda5.setCellValue("Universidad");
+        Cell celda6=fila1.createCell(6);
+        celda6.setCellValue("Pais");
+    }
+    public void TitulosColExter(Sheet hoja){
+        Row fila1=hoja.createRow(0);
+        Cell celda0=fila1.createCell(0);
+        celda0.setCellValue("Código");
+        Cell celda1=fila1.createCell(1);
+        celda1.setCellValue("Titulo");
+        Cell celda2=fila1.createCell(2);
+        celda2.setCellValue("Autor");
+        Cell celda3=fila1.createCell(3);
+        celda3.setCellValue("Universidad");
+        Cell celda4=fila1.createCell(4);
+        celda4.setCellValue("Pais");
+    }
     public void ResolverConflictos(String infoCompleta){
            // System.out.println(sismos.get(v));
             Conflictos.add(infoCompleta);
@@ -378,7 +423,7 @@ public class Excel {
             modelo.setValueAt(boton, modelo.getRowCount()-1, modelo.findColumn("Resolver"));
     } 
     public boolean GuardarExcelTEC(File archivo) throws IOException{
-        File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC.xlsx");
+        File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC y Autores Externos.xlsx");
         try ( // System.out.println(fileC.getAbsolutePath());
                 FileOutputStream fileout = new FileOutputStream(fileC.getAbsolutePath())) {
                 book2.write(fileout);
@@ -461,11 +506,13 @@ public class Excel {
     String BuscaPais(String[] InfoLinea) throws MalformedURLException, IOException{
         for (int i = 0; i < InfoLinea.length; i++) {
             String pais=InfoLinea[i];
+            //Copia para identificar siglas
+            String pais2=pais;
             pais=pais.toLowerCase();
             
             //asegurar que la primer letra del pais sea mayuscula
             pais=pais.replaceFirst(String.valueOf(pais.charAt(0)),String.valueOf(pais.charAt(0)).toUpperCase());
-            //Si el pais se conforma de mas letras
+            //Si el pais se conforma de mas palabras
             if(pais.contains(" ")){
                 String[] separaciones=pais.split(" ");
                 pais="";
@@ -483,7 +530,21 @@ public class Excel {
             }
             if(Paises.getPaises().contains(pais)){
                 return pais;
-            } 
+            }    
+        }
+        //Si no lo encuentra por el nombre lo intenta encontrar por la abreviatutura del pais
+        for (int i = 0; i < InfoLinea.length; i++) {
+            String[] palab=InfoLinea[i].split(" ");
+                for (int j = 0; j < palab.length; j++) {
+                    //si Todas las letras  son mayus
+                    if(palab[j].equals(palab[j].toUpperCase())){
+                        for (int k = 0; k < Paises.getCodPaises().length; k++) {
+                            if(palab[j].matches(Paises.getCodPaises()[k])){
+                                    return Paises.getCodPaises()[k];
+                            }   
+                        }
+                    } 
+                }
         }
         
         return "No encontrado";
@@ -495,8 +556,9 @@ public class Excel {
             if(infoMinus.charAt(0)==' '){
                 infoMinus=infoMinus.replaceFirst(" ", "");
             }
+            //Forest Ecology and Forest Management Group
             if(infoMinus.matches("(.*)univ(.*)")||infoMinus.matches("(.*)inst(.*)")||infoMinus.matches("(.*)cent(.*)")
-                ||infoMinus.matches("(.*)nacional(.*)")||infoMinus.matches("(.*)national(.*)")||infoMinus.matches("(.*)ctr(.*)")||infoMinus.matches("(.*)col(.*)")){
+                ||infoMinus.matches("(.*)nacional(.*)")||infoMinus.matches("(.*)national(.*)")||infoMinus.matches("(.*)ctr(.*)")||infoMinus.matches("(.*)coll(.*)")){
                 return InfoLinea[i];
             }
             

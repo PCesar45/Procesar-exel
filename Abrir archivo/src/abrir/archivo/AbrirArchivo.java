@@ -88,7 +88,6 @@ public class AbrirArchivo {
         Universidades.CrearListaUinternacional();
         Universidades.CrearListaUnacional();
         
-        
         Abrir abrir = new Abrir();
         
 //        //API Universidades: http://universities.hipolabs.com/search?name=Universidad%20de%20Costa%20Rica

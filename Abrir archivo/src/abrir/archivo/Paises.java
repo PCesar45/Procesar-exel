@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  */
 public class Paises {
     private static final ArrayList<String> paises=new ArrayList<>();
+     private static  String[] codPaises;
     public static void CrearListaPaises(){
         File myObj = new File("Paises en ing,es,fr y pt.txt");
         Scanner sc;
@@ -29,12 +30,26 @@ public class Paises {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AbrirArchivo.class.getName()).log(Level.SEVERE, null, ex);
         }
+        myObj = new File("Codigos Paises.txt");
+        try {
+            sc = new Scanner(myObj);
+            sc.useDelimiter("\\Z");
+            codPaises=sc.next().split(",");
+           
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AbrirArchivo.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //System.out.println(paises.contains("Georgia"));
     } 
 
     public static ArrayList<String> getPaises() {
         return paises;
     }
+
+    public static String[] getCodPaises() {
+        return codPaises;
+    }
+    
     
     
 }
