@@ -5,11 +5,18 @@
  */
 package abrir.archivo;
 
+import java.awt.List;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -27,6 +34,7 @@ public class Conflictos extends javax.swing.JFrame {
     public Conflictos(Excel excel) {
         initComponents();
         this.excel = excel;
+        
        
     }
 
@@ -49,8 +57,15 @@ public class Conflictos extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jTable1.setAutoCreateRowSorter(true);
+        jTable1.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -83,7 +98,7 @@ public class Conflictos extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Código", "Fila", "Tipo", "Exel", "Resolver "
+                "Código", "Fila", "Tipo", "Hoja excel", "Resolver "
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -94,12 +109,17 @@ public class Conflictos extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.setColumnSelectionAllowed(true);
+        jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTable1.setMinimumSize(new java.awt.Dimension(100, 750));
+        jTable1.setRowHeight(40);
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTable1MouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(jTable1);
+        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         scrollPane1.add(jScrollPane1);
 
@@ -116,21 +136,21 @@ public class Conflictos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1219, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(Guardar)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(Guardar)
-                .addGap(26, 863, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(scrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 473, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19)
+                .addGap(18, 18, 18)
                 .addComponent(Guardar)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -151,10 +171,38 @@ public class Conflictos extends javax.swing.JFrame {
         int columna=jTable1.columnAtPoint(evt.getPoint());
         //System.out.println(columna);
         if(fila < jTable1.getRowCount() && fila >=0 && columna < jTable1.getColumnCount() && columna>=0){
-            System.out.println(fila);
+           // System.out.println(fila);
             if(columna==4){
-                ResolverConflictos resol=new ResolverConflictos(Excel.getBook2(),fila,columna, (int) jTable1.getValueAt(fila, 1));
-                resol.getInfoLinea().setText(Excel.getConflictos().get(fila));
+                int hoja=0;
+                System.out.println(jTable1.getValueAt(fila, 3));
+                if(jTable1.getValueAt(fila, 3)=="AutoresTEC"){
+                    hoja=0;
+                }
+                 if(jTable1.getValueAt(fila, 3)=="Autores Internacionales"){
+                    hoja=1;
+                }
+                if(jTable1.getValueAt(fila, 3)=="Univesidad no reconocida"){
+                    hoja=2;
+                }
+                
+                ResolverConflictos resol=new ResolverConflictos(Excel.getBook2(),jTable1.convertRowIndexToModel(fila),columna, (int) jTable1.getValueAt(fila, 1),hoja);
+                System.out.println(fila);
+//                switch (hoja) {
+//                    case 0:
+//                        resol.getInfoLinea().setText(Excel.getConflictosAuTEC().get(fila));
+//                        break;
+//                    case 1:
+//                        resol.getInfoLinea().setText(Excel.getConflictosAuExtrn().get(fila));
+//                        break;
+//                    case 2:
+//                        resol.getInfoLinea().setText(Excel.getConflictosSinU().get(fila));
+//                        break;
+//                    default:
+//                        throw new AssertionError();
+//                }
+                System.out.println(jTable1.convertRowIndexToModel(fila));
+                System.out.println(jTable1.getModel().getValueAt(jTable1.convertRowIndexToModel(fila), 4).toString());
+                resol.getInfoLinea().setText(Excel.getConflictos().get(jTable1.convertRowIndexToModel(fila)));
                 resol.getTipo().setText((String) jTable1.getValueAt(fila, 2));
                 resol.setVisible(true);
                 
@@ -196,6 +244,8 @@ public class Conflictos extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Conflictos().setVisible(true);
+                
+
             }
         });
     }

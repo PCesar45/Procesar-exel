@@ -17,6 +17,7 @@ public class ResolverConflictos extends javax.swing.JFrame {
      private XSSFWorkbook ArchivoEX;
      private int filaExcep;
      private int columnaExcep;
+     private int hoja;
      private int filaExcel;
      private int columnaExcel;
     
@@ -36,24 +37,22 @@ public class ResolverConflictos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        InfoLinea = new java.awt.Label();
         jLabel3 = new javax.swing.JLabel();
         Tipo = new javax.swing.JLabel();
         Correcion = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        InfoLinea = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        InfoLinea.setBackground(new java.awt.Color(255, 255, 255));
-        InfoLinea.setText("label2");
-
-        jLabel3.setFont(new java.awt.Font("Trebuchet MS", 0, 13)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Trebuchet MS", 0, 15)); // NOI18N
         jLabel3.setText("Informacion Completa:");
 
-        Tipo.setFont(new java.awt.Font("Trebuchet MS", 0, 13)); // NOI18N
+        Tipo.setFont(new java.awt.Font("Trebuchet MS", 1, 15)); // NOI18N
         Tipo.setText("Tipo:");
 
-        Correcion.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        Correcion.setFont(new java.awt.Font("Calibri", 0, 16)); // NOI18N
+        Correcion.setToolTipText("");
 
         jButton1.setText("Aceptar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -62,6 +61,12 @@ public class ResolverConflictos extends javax.swing.JFrame {
             }
         });
 
+        InfoLinea.setEditable(false);
+        InfoLinea.setBackground(new java.awt.Color(255, 255, 255));
+        InfoLinea.setFont(new java.awt.Font("Calibri", 0, 16)); // NOI18N
+        InfoLinea.setText("jTextField1");
+        InfoLinea.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -69,34 +74,29 @@ public class ResolverConflictos extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(InfoLinea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(Tipo)
-                                .addGap(29, 29, 29)
-                                .addComponent(Correcion, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel3))
-                        .addGap(0, 756, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(jButton1)
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(Tipo)
+                        .addGap(29, 29, 29)
+                        .addComponent(Correcion, javax.swing.GroupLayout.PREFERRED_SIZE, 779, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel3)
+                    .addComponent(InfoLinea, javax.swing.GroupLayout.PREFERRED_SIZE, 1088, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(InfoLinea, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(InfoLinea, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Tipo)
-                    .addComponent(Correcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(89, 89, 89)
+                    .addComponent(Correcion, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(47, 47, 47)
                 .addComponent(jButton1)
-                .addContainerGap(101, Short.MAX_VALUE))
+                .addGap(42, 42, 42))
         );
 
         pack();
@@ -116,22 +116,28 @@ public class ResolverConflictos extends javax.swing.JFrame {
             case "Campus":
                 columnaExcel=4;
                 break;
+            case "Universidad":
+                columnaExcel=3;
+                break;
+            case "País":
+                columnaExcel=4;
+                break;
             default:
                 throw new AssertionError();
         }
-        ArchivoEX.getSheetAt(0).getRow(filaExcel-1).getCell(columnaExcel).setCellValue(Correcion.getText());
+        ArchivoEX.getSheetAt(hoja).getRow(filaExcel-1).getCell(columnaExcel).setCellValue(Correcion.getText());
       //  System.out.println("Aqui");
         dispose();
       
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    public ResolverConflictos(XSSFWorkbook ArchivoEX, int filaC, int columnaC,int filaExcel) {
+    public ResolverConflictos(XSSFWorkbook ArchivoEX, int filaC, int columnaC,int filaExcel,int hoja) {
         initComponents();
         this.ArchivoEX = ArchivoEX;
         this.filaExcep = filaC;
         this.columnaExcep = columnaC;
         this.filaExcel=filaExcel;
-        
+        this.hoja=hoja;
     }
 
     /**
@@ -169,7 +175,7 @@ public class ResolverConflictos extends javax.swing.JFrame {
         });
     }
 
-    public Label getInfoLinea() {
+    public JTextField getInfoLinea() {
         return InfoLinea;
     }
 
@@ -182,7 +188,7 @@ public class ResolverConflictos extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField Correcion;
-    private java.awt.Label InfoLinea;
+    private javax.swing.JTextField InfoLinea;
     private javax.swing.JLabel Tipo;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel3;

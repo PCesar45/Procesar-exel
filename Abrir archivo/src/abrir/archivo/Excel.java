@@ -21,6 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.apache.poi.EncryptedDocumentException;
 //import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -57,6 +59,8 @@ public class Excel {
     //Va a guardar la informacion de Authors with affiliations separada por comas
     //private String[] AuthorsWithAffDiv;
     private static ArrayList<String> Conflictos;
+    private static ArrayList<String> ConflictosAuExtrn;
+    private static ArrayList<String> ConflictosSinU;
     private static JTable tabla;
     private static DefaultTableModel modelo;
     boolean Utec=false;
@@ -67,6 +71,8 @@ public class Excel {
         book2=new XSSFWorkbook(); 
         AutoresWoS=new ArrayList<>();
         Conflictos=new ArrayList<>();
+        ConflictosAuExtrn=new ArrayList<>();
+        ConflictosSinU=new ArrayList<>();
         modelo=new DefaultTableModel();
         
     }
@@ -83,14 +89,17 @@ public class Excel {
        modelo.addColumn("Tipo");
        modelo.addColumn("Excel");
        modelo.addColumn("Resolver");
+    //   modelo.addColumn("");
+       
         
         Sheet hojaGuardarTEC = book2.createSheet("AutoresTEC");
         //nombres de las columnas del excel nuevo
         TitulosColTEC(hojaGuardarTEC);
         Sheet hojaGuardarInter= book2.createSheet("Autores Internacionales");
         TitulosColExter(hojaGuardarInter);
-        
-
+        //Hoja de sin Univerdades no reconocidas
+        Sheet hojaNoUni= book2.createSheet("Univesidad no reconocida");
+        TitulosColExter(hojaNoUni);
         
         try {
             book=new XSSFWorkbook(new FileInputStream(archivo));
@@ -104,6 +113,7 @@ public class Excel {
             int IndiceFila=-1;
             int ContFilasTEC=1;
             int ContFilasExtern=1;
+            int ContFilasNoUni=1;
             //VA SER VERDADERO SI EXISTEN FILAS POR RECORRER
             while (FilaIterator.hasNext()) {                
                 //INDICE FILA AUMENTA 1 POR CADA RECORRIDO
@@ -112,7 +122,7 @@ public class Excel {
                 //RECORRE LAS COLUMNAS O CELDAS DE UNA FILA YA CREADA
                 Iterator ColumnaIterator=fila.cellIterator();
                 //ASIGNAMOS
-                Object[]ListaColumna=new Object[5];
+                Object[]ListaColumna=new Object[6];
                //el indice columna vuelve a 0 en cada cambio de fila
                 int IndiceColumna=-1;
                 //VA SER VERDADERO SI EXISTEN COLUMNAS POR RECORRER
@@ -219,7 +229,7 @@ public class Excel {
                                                            añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AuthorsWithAffDiv1[i]);
                                                       }
                                                       else{
-                                                          añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","Autores Internacionales",AuthorsWithAffDiv1[i]);
+                                                          añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Internacionales",AuthorsWithAffDiv1[i]);
                                                       }
                                                       
                                                       
@@ -292,15 +302,19 @@ public class Excel {
                                             //Analizar Pais
                                             Pais=BuscaPais(AuthorsWithAffDiv2);
                                             if("No encontrado".equals(Pais)){
-                                                añadirConflicto(ListaColumna,ContFilasTEC+1,"País","Autores Internacionales",AuthorsWithAffDiv1[i]);
+                                                añadirConflicto(ListaColumna,ContFilasExtern+1,"País","Autores Internacionales",AuthorsWithAffDiv1[i]);
                                             }
                                             //Buscar Universidad
                                             Universidad=BuscarU(AuthorsWithAffDiv2);
                                             if("No encontrado".equals(Universidad)){
-                                                 añadirConflicto(ListaColumna,ContFilasTEC+1,"Universidad","Autores Internacionales",AuthorsWithAffDiv1[i]);
+                                                añadirConflicto(ListaColumna,ContFilasExtern+1,"Universidad","Univesidad no reconocida",AuthorsWithAffDiv1[i]);
+                                                GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
+                                                ContFilasNoUni++;
                                             }
-                                            GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
-                                            ContFilasExtern++;
+                                            else{
+                                                GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
+                                                ContFilasExtern++;
+                                            }
                                             
                                             break;
                                         }   
@@ -324,7 +338,6 @@ public class Excel {
                // if(IndiceFila!=0)modelo.addRow(ListaColumna);
             }
             mensaje="Importacion Exitosa";
-            
         } catch (IOException | EncryptedDocumentException e) {
         }
         
@@ -377,13 +390,19 @@ public class Excel {
         Cell celda04=filaNueva.createCell(4);
         celda04.setCellValue(Pais);
     }
-    public void añadirConflicto(Object[]ListaColumna,int Fila,String Tipo,String excel,String Info){
+    public void añadirConflicto(Object[]ListaColumna,int Fila,String Tipo,String HojaExcel,String Info){
         ListaColumna[0]=Codigo;
         ListaColumna[1]=Fila;
         ListaColumna[2]=Tipo;
-        ListaColumna[3]=excel;
+        ListaColumna[3]=HojaExcel;
+        JButton boton =new JButton("Resolver");
+        boton.setName(Info);
+         ListaColumna[4]=boton;
+      //  ListaColumna[5]=Info;
         modelo.addRow(ListaColumna);
-        ResolverConflictos(Info);
+        //System.out.println(HojaExcel);
+        Conflictos.add(Info);
+
     }
     public void TitulosColTEC(Sheet hoja){
         Row fila1=hoja.createRow(0);
@@ -400,7 +419,7 @@ public class Excel {
         Cell celda5=fila1.createCell(5);
         celda5.setCellValue("Universidad");
         Cell celda6=fila1.createCell(6);
-        celda6.setCellValue("Pais");
+        celda6.setCellValue("País");
     }
     public void TitulosColExter(Sheet hoja){
         Row fila1=hoja.createRow(0);
@@ -413,12 +432,13 @@ public class Excel {
         Cell celda3=fila1.createCell(3);
         celda3.setCellValue("Universidad");
         Cell celda4=fila1.createCell(4);
-        celda4.setCellValue("Pais");
+        celda4.setCellValue("País");
     }
-    public void ResolverConflictos(String infoCompleta){
+    public void ResolverConflictos(String InfoLinea){
            // System.out.println(sismos.get(v));
-            Conflictos.add(infoCompleta);
+            
             JButton boton =new JButton("Resolver");
+            boton.setName(InfoLinea);
             //System.out.println(modelo.getRowCount()-1+","+modelo.findColumn("Resolver"));
             modelo.setValueAt(boton, modelo.getRowCount()-1, modelo.findColumn("Resolver"));
     } 
@@ -507,7 +527,6 @@ public class Excel {
         for (int i = 0; i < InfoLinea.length; i++) {
             String pais=InfoLinea[i];
             //Copia para identificar siglas
-            String pais2=pais;
             pais=pais.toLowerCase();
             
             //asegurar que la primer letra del pais sea mayuscula
@@ -660,6 +679,9 @@ public class Excel {
         return "No encontrado"; 
     }
     String buscaCampus( String[] InfoFila){
+        if("CIDASTH - CENTRO DE INVESTIGACIÓN Y DESARROLLO EN AGRICULTURA SOSTENIBLE PARA EL TRÓPICO HÚMEDO".equals(Escuela)){
+            return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";   
+        }
       
         for (int i = 0; i < InfoFila.length; i++) {
             //Convierte toda la info en minusculas 
@@ -679,7 +701,18 @@ public class Excel {
                 return "4 - CENTRO ACADÉMICO DE LIMÓN";
             }
             if((Info.matches("(.*)alajuela(.*)"))){
-                return "5 - CENTRO ACADEMICO DE ALAJUELA";
+                if("DOCINADE".equals(Escuela)){
+                    return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";   
+                }
+                if("ECE - ESCUELA DE CIENCIAS NATURALES Y EXACTAS".equals(Escuela)){
+                    return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";   
+                }
+                if("EIC - ESCUELA DE IDIOMAS Y CIENCIAS SOCIALES".equals(Escuela)){
+                    return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";   
+                }
+                if("CIADEGTEC - CENTRO DE INVESTIGACIÓN EN ADMINISTRACIÓN".equals(Escuela)){
+                    return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";   
+                }
             }
         }
         return "No encontrado";
@@ -724,7 +757,6 @@ public class Excel {
     public static ArrayList<String> getConflictos() {
         return Conflictos;
     }
-
     public static XSSFWorkbook getBook2() {
         return book2;
     }
