@@ -5,6 +5,7 @@
 package abrir.archivo;
 
 import java.awt.Label;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -14,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author Pablo
  */
-public class ResolverConflictos extends javax.swing.JFrame {
+public class ResolverConflictosCombo extends javax.swing.JFrame {
      private XSSFWorkbook ArchivoEX;
      private int filaExcep;
      private int columnaExcep;
@@ -25,7 +26,7 @@ public class ResolverConflictos extends javax.swing.JFrame {
     /**
      * Creates new form ResolverConflictos
      */
-    public ResolverConflictos() {
+    public ResolverConflictosCombo() {
         initComponents();
     }
 
@@ -43,6 +44,8 @@ public class ResolverConflictos extends javax.swing.JFrame {
         Correccion = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         InfoLinea = new javax.swing.JTextField();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -68,21 +71,36 @@ public class ResolverConflictos extends javax.swing.JFrame {
         InfoLinea.setText("jTextField1");
         InfoLinea.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
 
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Trebuchet MS", 0, 15)); // NOI18N
+        jLabel4.setText("Otro:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(Tipo)
-                        .addGap(29, 29, 29)
-                        .addComponent(Correccion, javax.swing.GroupLayout.PREFERRED_SIZE, 779, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3)
-                    .addComponent(InfoLinea, javax.swing.GroupLayout.PREFERRED_SIZE, 1469, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jButton1)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(Tipo)
+                            .addGap(29, 29, 29)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(52, 52, 52)
+                            .addComponent(jLabel4)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(Correccion, javax.swing.GroupLayout.PREFERRED_SIZE, 779, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel3)
+                        .addComponent(InfoLinea, javax.swing.GroupLayout.PREFERRED_SIZE, 1382, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(104, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -91,21 +109,27 @@ public class ResolverConflictos extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(InfoLinea, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Tipo)
-                    .addComponent(Correccion, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(47, 47, 47)
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(Tipo)
+                        .addGap(86, 86, 86))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Correccion, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4))
+                        .addGap(53, 53, 53)))
                 .addComponent(jButton1)
-                .addGap(42, 42, 42))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if("".equals(Correccion.getText())){
-            JOptionPane.showMessageDialog(null, "Rellene la informacion");
+        if("".equals(Correccion.getText())&&("".equals(jComboBox1.getSelectedItem()))){
+             JOptionPane.showMessageDialog(null, "Rellene la informacion");
         }
         else{
             Excel.getModelo().removeRow(filaExcep);
@@ -129,15 +153,23 @@ public class ResolverConflictos extends javax.swing.JFrame {
                 default:
                     throw new AssertionError();
             }
-
-            ArchivoEX.getSheetAt(hoja).getRow(filaExcel-1).getCell(columnaExcel).setCellValue(Correccion.getText());
+            if("".equals(Correccion.getText())){
+                ArchivoEX.getSheetAt(hoja).getRow(filaExcel-1).getCell(columnaExcel).setCellValue((String) jComboBox1.getSelectedItem()); 
+            }
+            else{
+                ArchivoEX.getSheetAt(hoja).getRow(filaExcel-1).getCell(columnaExcel).setCellValue(Correccion.getText());
+            }
           //  System.out.println("Aqui");
             dispose();
         }
       
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    public ResolverConflictos(XSSFWorkbook ArchivoEX, int filaC, int columnaC,int filaExcel,int hoja) {
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    public ResolverConflictosCombo(XSSFWorkbook ArchivoEX, int filaC, int columnaC,int filaExcel,int hoja) {
         initComponents();
         this.ArchivoEX = ArchivoEX;
         this.filaExcep = filaC;
@@ -163,20 +195,21 @@ public class ResolverConflictos extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ResolverConflictos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ResolverConflictosCombo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ResolverConflictos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ResolverConflictosCombo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ResolverConflictos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ResolverConflictosCombo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ResolverConflictos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ResolverConflictosCombo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ResolverConflictos().setVisible(true);
+                new ResolverConflictosCombo().setVisible(true);
             }
         });
     }
@@ -184,9 +217,14 @@ public class ResolverConflictos extends javax.swing.JFrame {
     public JTextField getInfoLinea() {
         return InfoLinea;
     }
+    
 
     public JLabel getTipo() {
         return Tipo;
+    }
+
+    public JComboBox<String> getjComboBox1() {
+        return jComboBox1;
     }
     
     
@@ -197,6 +235,8 @@ public class ResolverConflictos extends javax.swing.JFrame {
     private javax.swing.JTextField InfoLinea;
     private javax.swing.JLabel Tipo;
     private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     // End of variables declaration//GEN-END:variables
 }

@@ -40,6 +40,7 @@ public class Excel {
     private static XSSFWorkbook book;
     
     private static XSSFWorkbook book2;
+    File ArchivoEntrada;
 //   private static XSSFWorkbook book3;
     private int columnaCodigo;
     private int columnaTitulo;
@@ -77,6 +78,7 @@ public class Excel {
         
     }
     public String Importar(File archivo,ProcesandoArchivo Progreso, JTable tablaExcep,Documento doc){
+        ArchivoEntrada=archivo;
         String mensaje="Error en la Importacion";
        // DefaultTableModel modelo=new DefaultTableModel();
         tabla=tablaExcep;
@@ -137,12 +139,18 @@ public class Excel {
                             if(doc==Documento.scopus){
                                 switch (celda.getStringCellValue()) {
                                     case ("EID")://codigo 
+                                    case("Código"):
+                                        System.out.println(IndiceColumna);
                                         columnaCodigo=IndiceColumna;
                                         break;
-                                    case "Title"://Titulo 
+                                    case "Title"://Titulo
+                                    case "Título del Artículo":
+                                        System.out.println(IndiceColumna);
                                         columnaTitulo=IndiceColumna;
                                         break;
                                     case "Authors with affiliations": 
+                                    case "Autores y Afiliación":
+                                        System.out.println(IndiceColumna);
                                         columnaAuthorsWithAff=IndiceColumna;
                                         break;
                                     default:
@@ -155,12 +163,15 @@ public class Excel {
                                // System.out.println(celda.getStringCellValue());
                                 switch (celda.getStringCellValue()) {
                                  case ("UT (Unique WOS ID)")://codigo 
+                                 case("Código"):
                                      columnaCodigo=IndiceColumna;
                                      break;
-                                 case "Article Title"://Titulo 
+                                 case "Article Title"://Titulo
+                                 case "Título del Artículo":
                                      columnaTitulo=IndiceColumna;
                                      break;
                                  case "Addresses": 
+                                 case "Autores y Afiliación":
                                      columnaAuthorsWithAff=IndiceColumna;
                                      break;
                                  default:
@@ -307,7 +318,7 @@ public class Excel {
                                             //Buscar Universidad
                                             Universidad=BuscarU(AuthorsWithAffDiv2);
                                             if("No encontrado".equals(Universidad)){
-                                                añadirConflicto(ListaColumna,ContFilasExtern+1,"Universidad","Univesidad no reconocida",AuthorsWithAffDiv1[i]);
+                                                añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AuthorsWithAffDiv1[i]);
                                                 GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
                                                 ContFilasNoUni++;
                                             }
@@ -443,7 +454,7 @@ public class Excel {
             modelo.setValueAt(boton, modelo.getRowCount()-1, modelo.findColumn("Resolver"));
     } 
     public boolean GuardarExcelTEC(File archivo) throws IOException{
-        File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC y Autores Externos.xlsx");
+        File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC y Autores Externos ("+ArchivoEntrada.getName()+").xlsx");
         try ( // System.out.println(fileC.getAbsolutePath());
                 FileOutputStream fileout = new FileOutputStream(fileC.getAbsolutePath())) {
                 book2.write(fileout);

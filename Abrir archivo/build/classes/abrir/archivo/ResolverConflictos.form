@@ -30,12 +30,12 @@
                   <Group type="102" attributes="0">
                       <Component id="Tipo" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="Correcion" min="-2" pref="779" max="-2" attributes="0"/>
+                      <Component id="Correccion" min="-2" pref="779" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                  <Component id="InfoLinea" alignment="0" min="-2" pref="1088" max="-2" attributes="0"/>
+                  <Component id="InfoLinea" alignment="0" min="-2" pref="1469" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="30" max="32767" attributes="0"/>
+              <EmptySpace pref="26" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -46,10 +46,10 @@
               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="InfoLinea" min="-2" pref="222" max="-2" attributes="0"/>
-              <EmptySpace pref="27" max="32767" attributes="0"/>
+              <EmptySpace pref="76" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="Tipo" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="Correcion" alignment="3" min="-2" pref="51" max="-2" attributes="0"/>
+                  <Component id="Correccion" alignment="3" min="-2" pref="51" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
@@ -75,7 +75,7 @@
         <Property name="text" type="java.lang.String" value="Tipo:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="Correcion">
+    <Component class="javax.swing.JTextField" name="Correccion">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Calibri" size="16" style="0"/>

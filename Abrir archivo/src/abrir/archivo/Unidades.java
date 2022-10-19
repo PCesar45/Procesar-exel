@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 public class Unidades{
     private static final ArrayList<String[]> PalabrasClave=new ArrayList<>();
     private static final ArrayList<String[]> FrasesClave=new ArrayList<>();
+    
     public Unidades() {}
      public static void CrearListaPalabrasClave(){
         try {
@@ -52,10 +53,4 @@ public class Unidades{
     public static ArrayList<String[]> getFrasesClave() {
         return FrasesClave;
     }
-    
-
-    
-    
-        
-    
 }

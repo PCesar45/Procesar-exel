@@ -24,6 +24,8 @@ import javax.swing.table.TableRowSorter;
  */
 public class Conflictos extends javax.swing.JFrame {
     private Excel excel;
+    private static final  String[] unidadesDeInvestigacion=",CIB - CENTRO DE INVESTIGACIÓN EN BIOTECNOLOGÍA,CIC - CENTRO DE INVESTIGACIONES EN COMPUTACIÓN,CIF - CENTRO DE INVESTIGACIÓN EN INNOVACIÓN FORESTAL,CIPA - CENTRO DE INVESTIGACIÓN EN PROTECCIÓN AMBIENTAL,CIVCO - CENTRO DE INVESTIGACIÓN EN VIVIENDA Y CONSTRUCCIÓN,CIDASTH - CENTRO DE INVESTIGACIÓN Y DESARROLLO EN AGRICULTURA SOSTENIBLE PARA EL TRÓPICO HÚMEDO,CIGA - CENTRO DE INVESTIGACIÓN Y GESTIÓN AGROINDUSTRIAL,CEQIATEC - CENTRO DE INVESTIGACIÓN Y DE SERVICIOS QUÍMICOS Y MICROBIOLÓGICOS,CIEMTEC - CENTRO DE INVESTIGACIÓN Y EXTENSIÓN EN MATERIALES,CIADEGTEC - CENTRO DE INVESTIGACIÓN EN ADMINISTRACIÓN, ECONOMÍA Y GESTIÓN TECNOLÓGICA,ATI - AREA DE ADMINISTRACION DE TECNOLOGIA DE INFORMACIÓN,AU - ESCUELA ARQUITECTURA Y URBANISMO,CD - ESCUELA DE CULTURA Y DEPORTE,CDA - CENTRO DE DESARROLLO ACADEMICO,CI - ESCUELA DE CIENCIAS DEL LENGUAJE,CIT - CENTRO DE VINCULACIÓN,DOCINADE,CS - ESCUELA DE CIENCIAS SOCIALES,DI - ESCUELA DISEÑO INDUSTRIAL,DOP - ORIENTACION Y PSICOLOGIA,DP - AREA ACADEMICA DE DOCTORADO EN INGENIERIA,E - ESCUELA DE INGENIERIA EN ELECTRONICA,ECE - ESCUELA DE CIENCIAS NATURALES Y EXACTAS,EIC - ESCUELA DE IDIOMAS Y CIENCIAS SOCIALES,ET - ESCUELA DE EDUCACION TECNICA,FI - ESCUELA DE FISICA,GPM - AREA ACADEMICA DE GERENCIA DE PROYECTOS,IA - ESCUELA INGENIERIA AGRICOLA,IDC - INGENIERIA EN COMPUTADORES,IMT - AREA ACADEMICA INGENIERIA MECATRONICA,MA - ESCUELA DE MATEMATICA,MI - ESCUELA DE INGENIERIA ELECTROMECANICA,MRN - AREA ACADEMICA AGROFORESTAL,OEG - PROGRAMA DE EQUIDAD DE GENERO,PI - ESCUELA DE INGENIERIA EN PRODUCCION INDUSTRIAL,QU - ESCUELA DE QUIMICA,SCC - ESCUELA DE CIENCIAS Y LETRAS,SHO - ESCUELA DE INGENIERIA EN SEGURIDAD LABORAL E HIGIENE AMBIENTAL,VIE - VICERRECTORIA DE INVESTIGACION Y EXTENSION,Laboratorio de Ergonomia,Laboratotorio de Plasma,N/A - SIN DEPARTAMENTO".split(",");
+    private static final  String[] Campus=",1 - CAMPUS TECNOLOGICO CENTRAL CARTAGO,2 - CAMPUS TECNOLOGICO LOCAL SAN JOSE,3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS,4 - CENTRO ACADEMICO DE LIMON,5 - CENTRO ACADEMICO DE ALAJUELA,Sin Campus".split(",");
     /**
      * Creates new form Conflictos
      */
@@ -50,17 +52,25 @@ public class Conflictos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        scrollPane1 = new java.awt.ScrollPane();
+        Guardar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        Guardar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        Guardar.setText("Guardar");
+        Guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarActionPerformed(evt);
+            }
+        });
 
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -109,9 +119,9 @@ public class Conflictos extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setColumnSelectionAllowed(true);
         jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jTable1.setMinimumSize(new java.awt.Dimension(100, 750));
+        jTable1.setEnabled(false);
+        jTable1.setName(""); // NOI18N
         jTable1.setRowHeight(40);
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -121,15 +131,6 @@ public class Conflictos extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
         jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        scrollPane1.add(jScrollPane1);
-
-        Guardar.setText("Guardar");
-        Guardar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                GuardarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -137,20 +138,20 @@ public class Conflictos extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1219, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(Guardar)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1820, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 473, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 756, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(Guardar)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addGap(17, 17, 17))
         );
 
         pack();
@@ -184,29 +185,33 @@ public class Conflictos extends javax.swing.JFrame {
                 if(jTable1.getValueAt(fila, 3)=="Univesidad no reconocida"){
                     hoja=2;
                 }
-                
-                ResolverConflictos resol=new ResolverConflictos(Excel.getBook2(),jTable1.convertRowIndexToModel(fila),columna, (int) jTable1.getValueAt(fila, 1),hoja);
-                System.out.println(fila);
-//                switch (hoja) {
-//                    case 0:
-//                        resol.getInfoLinea().setText(Excel.getConflictosAuTEC().get(fila));
-//                        break;
-//                    case 1:
-//                        resol.getInfoLinea().setText(Excel.getConflictosAuExtrn().get(fila));
-//                        break;
-//                    case 2:
-//                        resol.getInfoLinea().setText(Excel.getConflictosSinU().get(fila));
-//                        break;
-//                    default:
-//                        throw new AssertionError();
-//                }
-                System.out.println(jTable1.convertRowIndexToModel(fila));
-                System.out.println(jTable1.getModel().getValueAt(jTable1.convertRowIndexToModel(fila), 4).toString());
-                resol.getInfoLinea().setText(Excel.getConflictos().get(jTable1.convertRowIndexToModel(fila)));
-                resol.getTipo().setText((String) jTable1.getValueAt(fila, 2));
-                resol.setVisible(true);
-                
-                
+                System.out.println((String) jTable1.getValueAt(fila, 2));
+                if("Escuela o Unidad".equals((String) jTable1.getValueAt(fila, 2))||"Campus".equals((String) jTable1.getValueAt(fila, 2))){
+                    if("Escuela o Unidad".equals((String) jTable1.getValueAt(fila, 2))){
+                        ResolverConflictosCombo resolEscu=new ResolverConflictosCombo(Excel.getBook2(),jTable1.convertRowIndexToModel(fila),columna, (int) jTable1.getValueAt(fila, 1),hoja);
+                        for (String unidadDeInvestigacion :unidadesDeInvestigacion) {
+                            resolEscu.getjComboBox1().addItem(unidadDeInvestigacion);
+                        }
+                        resolEscu.getInfoLinea().setText(Excel.getConflictos().get(jTable1.convertRowIndexToModel(fila)));
+                        resolEscu.getTipo().setText((String) jTable1.getValueAt(fila, 2));
+                        resolEscu.setVisible(true);
+                    }
+                    if("Campus".equals((String) jTable1.getValueAt(fila, 2))){
+                        ResolverConflictosCombo resolCampus=new ResolverConflictosCombo(Excel.getBook2(),jTable1.convertRowIndexToModel(fila),columna, (int) jTable1.getValueAt(fila, 1),hoja);
+                        for (String Sede :Campus) {
+                            resolCampus.getjComboBox1().addItem(Sede);
+                        }
+                        resolCampus.getInfoLinea().setText(Excel.getConflictos().get(jTable1.convertRowIndexToModel(fila)));
+                        resolCampus.getTipo().setText((String) jTable1.getValueAt(fila, 2));
+                        resolCampus.setVisible(true);
+                    }
+                }
+                else{
+                    ResolverConflictos resol=new ResolverConflictos(Excel.getBook2(),jTable1.convertRowIndexToModel(fila),columna, (int) jTable1.getValueAt(fila, 1),hoja);
+                    resol.getInfoLinea().setText(Excel.getConflictos().get(jTable1.convertRowIndexToModel(fila)));
+                    resol.getTipo().setText((String) jTable1.getValueAt(fila, 2));
+                    resol.setVisible(true);
+                }   
             }
         }
     }//GEN-LAST:event_jTable1MouseClicked
@@ -260,6 +265,5 @@ public class Conflictos extends javax.swing.JFrame {
     private javax.swing.JButton Guardar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private java.awt.ScrollPane scrollPane1;
     // End of variables declaration//GEN-END:variables
 }
