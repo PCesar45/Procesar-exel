@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 /**
@@ -28,12 +29,20 @@ public class Guardar {
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
-            System.out.println("Save as file: " + fileToSave.getAbsolutePath());
-            //ProcesandoArchivo Cargando = new ProcesandoArchivo();
-           // Cargando.setVisible(true);
-           ex.GuardarExcelTEC(fileToSave);
-           ExitoGuardar exito=new ExitoGuardar(parentFrame, true);
-           exito.setVisible(true);
+
+            ex.GuardarExcelTEC(fileToSave);
+            ExitoGuardar exito=new ExitoGuardar();
+            exito.setVisible(true);
+        }
+        else{
+            int resp=JOptionPane.showConfirmDialog(null, "¿Salir sin guardar?","No guardado",JOptionPane.ERROR_MESSAGE);
+            if(resp==0){
+                System.exit(0);
+            }
+            else{
+                Guardar g=new Guardar(ex);
+                
+            }
         }
     }
     

@@ -8,6 +8,9 @@ package abrir.archivo;
 import java.awt.Label;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Thread.MAX_PRIORITY;
+import java.util.ArrayList;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -75,13 +78,14 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
             }
         });
 
-        label1.setFont(new java.awt.Font("Trebuchet MS", 0, 14)); // NOI18N
+        label1.setFont(new java.awt.Font("Trebuchet MS", 0, 18)); // NOI18N
         label1.setText("Archivo seleccionado:");
 
         archSelect.setAlignment(java.awt.Label.CENTER);
         archSelect.setBackground(new java.awt.Color(255, 255, 255));
-        archSelect.setFont(new java.awt.Font("Trebuchet MS", 0, 14)); // NOI18N
+        archSelect.setFont(new java.awt.Font("Trebuchet MS", 0, 17)); // NOI18N
 
+        rb_Scopus.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
         rb_Scopus.setText("Scopus");
         rb_Scopus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,7 +93,8 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
             }
         });
 
-        rb_WoS.setText("WoS");
+        rb_WoS.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
+        rb_WoS.setText("WoS/Web of Science");
         rb_WoS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rb_WoSActionPerformed(evt);
@@ -101,24 +106,24 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(rb_Scopus)
-                                    .addComponent(rb_WoS))))
-                        .addGap(0, 45, Short.MAX_VALUE))
+                        .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(Inicio)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Cancelar)))
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(archSelect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(Inicio)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 386, Short.MAX_VALUE)
+                                .addComponent(Cancelar))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(rb_Scopus)
+                                    .addComponent(rb_WoS))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(17, 17, 17))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,25 +131,27 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(archSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22)
                 .addComponent(rb_Scopus)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(rb_WoS)
-                .addGap(24, 24, 24)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Inicio)
                     .addComponent(Cancelar))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         label1.getAccessibleContext().setAccessibleName("Archivo Seleccionado");
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void CancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelarActionPerformed
-        // TODO add your handling code here:
+        dispose();
+        Abrir abrir = new Abrir();
     }//GEN-LAST:event_CancelarActionPerformed
 
     private void InicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InicioActionPerformed
@@ -209,22 +216,43 @@ public class ProcesandoArchivo extends javax.swing.JFrame {
         
         
         if(!rb_Scopus.isSelected()&&!rb_WoS.isSelected()){
-            JOptionPane.showMessageDialog(null, "Seleccione un tipo de archivo");
+            JOptionPane.showMessageDialog(null, "Seleccione un tipo de archivo","Tipo de archivo",JOptionPane.ERROR_MESSAGE);
         }else{
+            
             Excel ex = new Excel();
-             dispose();
+            dispose();
+            
             Conflictos conflic=new Conflictos(ex);
             //Procesa el archivo
 
             conflic.setTitle("Conflictos encontrados");
-            conflic.setVisible(true);
+            
             Documento doc;
             if(rb_Scopus.isSelected()){
                 doc=Documento.scopus;
             }else{
                 doc=Documento.WoS;
             }
-            ex.Importar(Archivo,this,conflic.getjTable1(),doc);
+            Cargando cargando = new Cargando();
+            cargando.setVisible(true);
+            Thread principal=Thread.currentThread();
+            Runnable runnable = new Runnable() {
+               @Override
+               public void run() {
+
+                ex.Importar(Archivo,conflic.getjTable1(),doc);
+                cargando.dispose();
+                conflic.setVisible(true);
+               }
+            };
+
+            Thread hilo=new Thread(runnable);
+            hilo.start();
+           
+            
+            
+            
+            
         }
         
     }

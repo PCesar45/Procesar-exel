@@ -155,6 +155,7 @@ public class Conflictos extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
@@ -185,7 +186,6 @@ public class Conflictos extends javax.swing.JFrame {
                 if(jTable1.getValueAt(fila, 3)=="Univesidad no reconocida"){
                     hoja=2;
                 }
-                System.out.println((String) jTable1.getValueAt(fila, 2));
                 if("Escuela o Unidad".equals((String) jTable1.getValueAt(fila, 2))||"Campus".equals((String) jTable1.getValueAt(fila, 2))){
                     if("Escuela o Unidad".equals((String) jTable1.getValueAt(fila, 2))){
                         ResolverConflictosCombo resolEscu=new ResolverConflictosCombo(Excel.getBook2(),jTable1.convertRowIndexToModel(fila),columna, (int) jTable1.getValueAt(fila, 1),hoja);

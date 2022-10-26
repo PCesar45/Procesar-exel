@@ -13,22 +13,11 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import org.apache.poi.EncryptedDocumentException;
-//import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
-//import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.*;
 
 /**
@@ -41,16 +30,15 @@ public class Excel {
     
     private static XSSFWorkbook book2;
     File ArchivoEntrada;
-//   private static XSSFWorkbook book3;
-    private int columnaCodigo;
-    private int columnaTitulo;
-    private int columnaAuthorsWithAff;
+    private int columnaCodigo=-1;
+    private int columnaTitulo=-1;
+    private int columnaAutoresConAfi=-1;
 
     //esto va a cambiar segun la fila ,por ciclo
     private String Codigo;
     private String Titulo;
-    //la de AuthorsWithAff hay que dividirla en mas partes
-    private String AuthorsWithAff;
+    //la de AutoresConAfi hay que dividirla en mas partes
+    private String AutoresConAfi;
     private String Autor;
     private String Escuela;
     private String Campus;
@@ -60,40 +48,30 @@ public class Excel {
     //Va a guardar la informacion de Authors with affiliations separada por comas
     //private String[] AuthorsWithAffDiv;
     private static ArrayList<String> Conflictos;
-    private static ArrayList<String> ConflictosAuExtrn;
-    private static ArrayList<String> ConflictosSinU;
     private static JTable tabla;
     private static DefaultTableModel modelo;
     boolean Utec=false;
-    //Botones de resolver conflictos
-    //private static ArrayList<JButton> botones=new ArrayList<>();
     public Excel() {
-        System.out.println("Inicializa");
         book2=new XSSFWorkbook(); 
         AutoresWoS=new ArrayList<>();
         Conflictos=new ArrayList<>();
-        ConflictosAuExtrn=new ArrayList<>();
-        ConflictosSinU=new ArrayList<>();
+
         modelo=new DefaultTableModel();
         
     }
-    public String Importar(File archivo,ProcesandoArchivo Progreso, JTable tablaExcep,Documento doc){
+    public String Importar(File archivo, JTable tablaExcep,Documento doc){
         ArchivoEntrada=archivo;
         String mensaje="Error en la Importacion";
-       // DefaultTableModel modelo=new DefaultTableModel();
         tabla=tablaExcep;
         tabla.setModel(modelo);
         tabla.setDefaultRenderer(Object.class, new Render());
-       //Para guardar el nuevo exel
-       //----------------
-       modelo.addColumn("Codigo");
-       modelo.addColumn("Fila");
-       modelo.addColumn("Tipo");
-       modelo.addColumn("Excel");
-       modelo.addColumn("Resolver");
-    //   modelo.addColumn("");
-       
-        
+        //Para guardar el nuevo exel
+        //----------------
+        modelo.addColumn("Codigo");
+        modelo.addColumn("Fila");
+        modelo.addColumn("Tipo");
+        modelo.addColumn("Excel");
+        modelo.addColumn("Resolver");
         Sheet hojaGuardarTEC = book2.createSheet("AutoresTEC");
         //nombres de las columnas del excel nuevo
         TitulosColTEC(hojaGuardarTEC);
@@ -102,16 +80,15 @@ public class Excel {
         //Hoja de sin Univerdades no reconocidas
         Sheet hojaNoUni= book2.createSheet("Univesidad no reconocida");
         TitulosColExter(hojaNoUni);
-        
+        //para la informacion de la Universidad no identicada
+        Cell celda5=hojaNoUni.getRow(0).createCell(5);
+        celda5.setCellValue("Informacion Completa");
         try {
             book=new XSSFWorkbook(new FileInputStream(archivo));
             Sheet hoja=book.getSheetAt(0);
             Iterator FilaIterator=hoja.rowIterator();
-           // System.out.println(hoja.getLastRowNum());
-            double Porciento=hoja.getLastRowNum()/100;
-            int x = 1;
-            int cont=0;
-             int contAutoresWoS=-1;
+            float Porciento=(float)100/(hoja.getLastRowNum());
+            int contAutoresWoS=-1;
             int IndiceFila=-1;
             int ContFilasTEC=1;
             int ContFilasExtern=1;
@@ -131,7 +108,6 @@ public class Excel {
                 while (ColumnaIterator.hasNext()) {                    
                     //INDICE COLUMNA AUMENTA 1 POR CADA RECORRIDO
                     IndiceColumna++;
-                   
                     Cell celda=(Cell)ColumnaIterator.next();
                     if(celda!=null){
                         //si es la primer fila localizamos en que columna va a estar el codigo ,titulo y Authors with affiliations 
@@ -139,94 +115,78 @@ public class Excel {
                             if(doc==Documento.scopus){
                                 switch (celda.getStringCellValue()) {
                                     case ("EID")://codigo 
-                                    case("Código"):
-                                        System.out.println(IndiceColumna);
+                                    case("Código")://Estandar
                                         columnaCodigo=IndiceColumna;
                                         break;
                                     case "Title"://Titulo
-                                    case "Título del Artículo":
-                                        System.out.println(IndiceColumna);
+                                    case "Título"://Estandar
+                                        //System.out.println(IndiceColumna);
                                         columnaTitulo=IndiceColumna;
                                         break;
                                     case "Authors with affiliations": 
-                                    case "Autores y Afiliación":
-                                        System.out.println(IndiceColumna);
-                                        columnaAuthorsWithAff=IndiceColumna;
+                                    case "Autores y afiliación"://Estandar
+                                        columnaAutoresConAfi=IndiceColumna;
                                         break;
                                     default:
-                                        System.out.println("Error columna no identificada");
+                                        //System.out.println("Error columna no identificada");
                                         break;
                                 }
                             }
                             else{
-                              //  System.out.println(IndiceColumna);
-                               // System.out.println(celda.getStringCellValue());
                                 switch (celda.getStringCellValue()) {
-                                 case ("UT (Unique WOS ID)")://codigo 
-                                 case("Código"):
-                                     columnaCodigo=IndiceColumna;
-                                     break;
-                                 case "Article Title"://Titulo
-                                 case "Título del Artículo":
-                                     columnaTitulo=IndiceColumna;
-                                     break;
-                                 case "Addresses": 
-                                 case "Autores y Afiliación":
-                                     columnaAuthorsWithAff=IndiceColumna;
-                                     break;
-                                 default:
-                                     System.out.println("Error columna no identificada");
-                                     //Si no lo encuentra puede ser que los nombres estan en otra fila,reinicio las filas
-                                     
-                                     break;
-                             } 
+                                    case ("UT (Unique WOS ID)")://codigo 
+                                    case("Código")://Estandar
+                                        columnaCodigo=IndiceColumna;
+                                        break;
+                                    case "Article Title"://Titulo
+                                    case "Título"://Estandar
+                                        columnaTitulo=IndiceColumna;
+                                        break;
+                                    case "Addresses": 
+                                    case "Autores y afiliación"://Estandar
+                                        columnaAutoresConAfi=IndiceColumna;
+                                        break;
+                                    default:
+                                        //System.out.println("Error columna no identificada");  
+                                        break;
+                                } 
                             }
-                        }else{
-                            //contenido de la fila
                             
-                            //Saca el codigo y lo gaurda temporalmente
-                            if(IndiceColumna==columnaCodigo){
+                        }else{
+                            if(columnaCodigo==-1||columnaTitulo==-1||columnaAutoresConAfi==-1){
+                                JOptionPane.showMessageDialog(null, "Nombres de las columnas del archivo fuente deben ser repectivamente:\n\nCódigo|Título|Autores con afiliación\n\nTambién deben estar en la primer fila del Excel,tambien se deben poner las mayusculas y tildes como  vienen aquí\nPor favor corrija los nombres y vuelva a abrir el archivo","Nombres de las columnas del archivo fuente incorrectas",JOptionPane.ERROR_MESSAGE);
                                 
+                                System.exit(0);
+                            }
+                            //contenido de la fila
+                            //Saca el codigo y lo guarda temporalmente esto cambia en cada fila
+                            if(IndiceColumna==columnaCodigo){
                                Codigo=celda.getStringCellValue();
-                             //  System.out.println("Codigo: "+Codigo);
                             }
                             //Saca el titulo y lo guarda temporalmente
                             if(IndiceColumna==columnaTitulo){
                                Titulo=celda.getStringCellValue();
-                              // System.out.println(Titulo);
                             }
                             //Saca toda la informacion de Authors with affiliations y la guarda en una variable para posteriomente procesarla
-                            if(IndiceColumna==columnaAuthorsWithAff){
-                               // System.out.println(celda.getStringCellValue());
-                                AuthorsWithAff=celda.getStringCellValue();
+                            if(IndiceColumna==columnaAutoresConAfi){
+                                AutoresConAfi=celda.getStringCellValue();
                                 //Si se trata de Wos aqui se le dara el mismo formato que Scopus
-                               
-                                if(doc==Documento.WoS){
-                                     
-                                     AuthorsWithAff=DarFormato(AuthorsWithAff);
+                                if(doc==Documento.WoS){  
+                                     AutoresConAfi=DarFormato(AutoresConAfi);
                                 }
                                 //Aqui se va a analizar y separar la columan de Authors with affiliations
                                 //primero voy a remplazar los ; por , para procesar toda la informacion por igual 
-                               // System.out.println(AuthorsWithAff);
-                                String[] AuthorsWithAffDiv1 = AuthorsWithAff.split("; ");
-                                
+                                String[] AuthorsWithAffDiv1 = AutoresConAfi.split("; ");   
                                 for (int i = 0; i < AuthorsWithAffDiv1.length; i++) {
                                     contAutoresWoS++;
                                    // voy a separar la informacion por las comas
                                     String[] AuthorsWithAffDiv2 = AuthorsWithAffDiv1[i].split(", ");
                                     //Se identifica si la informacion se trata del TEC
-                                    
                                     Utec=AnalisisUTec(AuthorsWithAffDiv2);
-                                    //System.out.println(Arrays.toString(AuthorsWithAffDiv2));
                                     for (int j = 0; j < AuthorsWithAffDiv2.length; j++) {
-                                        
-                                        String AuthorsWithAffDivInfo=AuthorsWithAffDiv2[j];
-                                        
                                         if(doc==Documento.scopus){
                                             //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
-                                           
                                             if(AuthorsWithAffDiv2.length>=2){
-                                                 //System.out.println(AuthorsWithAffDiv2[0]+","+AuthorsWithAffDiv2[1]);
                                                 if(!"No encontrado".equals(AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]))){
                                                     Autor=AnalisisAutorScopus(AuthorsWithAffDiv2[0],AuthorsWithAffDiv2[1]);
                                                 }else{//en caso de que no lo encuentre lo busca en toda la linea 
@@ -234,82 +194,51 @@ public class Excel {
                                                         Autor=buscaAutorScopus(AuthorsWithAffDiv2);
                                                     }
                                                     else{
-                                                       // si del todo no lo encuentra  lo mandaria a excepciones 
-                                                      Autor="No encontrado";
-                                                      if(Utec){
-                                                           añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AuthorsWithAffDiv1[i]);
-                                                      }
-                                                      else{
-                                                          añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Internacionales",AuthorsWithAffDiv1[i]);
-                                                      }
-                                                      
-                                                      
-                                                       // System.out.println("Este no lo encuentra");
-                                                        //System.out.println(AuthorsWithAffDiv1[i]);
+                                                        // si del todo no lo encuentra  lo mandaria a excepciones 
+                                                        Autor="No encontrado";
+                                                        if(Utec){
+                                                             añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AuthorsWithAffDiv1[i]);
+                                                        }
+                                                        else{
+                                                            añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Internacionales",AuthorsWithAffDiv1[i]);
+                                                        }
                                                     }
-
-
                                                 }
                                             }
                                         }
                                          //Si no es Scopus es WoS
                                         else{
-//                                            while (contAutoresWoS<AutoresWoS.size()) {                                                
-//                                                Autor=AutoresWoS.get(contAutoresWoS);
-//                                                contAutoresWoS++;
-//                                            }
-                                            //System.out.println();
                                             Autor=AutoresWoS.get(contAutoresWoS);
-                                           // System.out.println(contAutoresWoS);
                                         }
-                                         //si la informacion es del TEC
+                                        //si la informacion es del TEC
                                         if(Utec){
-                                            
                                             //Escuela
                                             String resultadoEscuela=buscaEscuela(AuthorsWithAffDiv2);
                                             if(!"No encontrado".equals(resultadoEscuela)){
                                                 Escuela=resultadoEscuela;
-                                               // System.out.println(Escuela);
                                             }
                                             else{
                                                    //Estos a excepciones 
                                                    Escuela="No encontrado";
-                                                   //System.out.println(AuthorsWithAffDiv1[i]);
                                                    añadirConflicto(ListaColumna,ContFilasTEC+1,"Escuela o Unidad","AutoresTEC",AuthorsWithAffDiv1[i]);
                                             }
-                                            //Campus
+                                            //Buscar el campus
                                             String resultadoCampus=buscaCampus(AuthorsWithAffDiv2);
                                             if(!"No encontrado".equals(resultadoCampus)){
                                                 Campus=resultadoCampus;
-                                               // System.out.println(Escuela);
                                             }
                                             else{
-                                                 //System.out.println("Este no lo encuentra Escuela");
-                                                 //System.out.println(Codigo);
-                                                 //System.out.println(AuthorsWithAffDiv1[i]);
-                                                //Estos a excepciones 
                                                 Campus="No encontrado";
-                                                
                                                 añadirConflicto(ListaColumna,ContFilasTEC+1,"Campus","AutoresTEC",AuthorsWithAffDiv1[i]);
                                             }
                                             //Universidad y Pais autores TEC son fijos
                                             Universidad="Instituto Tecnologico de Costa Rica";
                                             Pais="Costa Rica";
-
-                                           // System.out.println(Autor);
-                                            
-                                            //TEC:System.out.println(AuthorsWithAffDivInfo) 
-                                            //System.out.println(ContFilasTEC);
                                             GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
                                             ContFilasTEC++;
                                             //necesario para evitar repetidos
                                             break;
-                                           // System.out.println(ContFilasTEC);
                                         }else{//Autores externos
-                                            
-                                            // System.out.println(AuthorsWithAffDiv1[i]);
-                                            
-                                            
                                             //Analizar Pais
                                             Pais=BuscaPais(AuthorsWithAffDiv2);
                                             if("No encontrado".equals(Pais)){
@@ -320,13 +249,14 @@ public class Excel {
                                             if("No encontrado".equals(Universidad)){
                                                 añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AuthorsWithAffDiv1[i]);
                                                 GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
+                                                Cell celda05=hojaNoUni.getRow(ContFilasNoUni).createCell(5);
+                                                celda05.setCellValue(AuthorsWithAffDiv1[i]);
                                                 ContFilasNoUni++;
                                             }
                                             else{
                                                 GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
                                                 ContFilasExtern++;
                                             }
-                                            
                                             break;
                                         }   
                                     }
@@ -335,42 +265,14 @@ public class Excel {
                         }
                     }
                 }       
-//               if(cont>Porciento){
-//                    System.out.println(x);
-//                    x++;
-//                    cont=0;
-//                    
-//               }
-//               cont++;      
-//                if(IndiceFila==1){
-//                   break; 
-//                }
-               
-               // if(IndiceFila!=0)modelo.addRow(ListaColumna);
+                Cargando.getjProgressBar1().setValue((int) (Porciento*(IndiceFila+1)));
+                Cargando.getjProgressBar1().setString(String.valueOf((int) (Porciento*(IndiceFila+1)))+"%");
             }
             mensaje="Importacion Exitosa";
         } catch (IOException | EncryptedDocumentException e) {
         }
-        
         return mensaje;
     }
-//    public static String Exportar(){
-//        String mensaje="Error en la Exportacion";
-//       
-//        
-//            for (int i = -1; i < NumeroFila; i++) {
-//                Row fila=hoja.createRow(i+1);
-//                for (int j = 0; j <NumeroColumna-1; j++) {
-//                    Cell celda=fila.createCell(j);
-//                    if(i==-1){
-//                        celda.setCellValue(String.valueOf(tabla.getColumnName(j)));
-//                    }else{
-//                        
-//                    }
-//                }
-//            }
-//        
-//    }
     public void GuardarFilaAuTEC(Sheet hoja,int fila){
         Row filaNueva=hoja.createRow(fila);
         Cell celda00=filaNueva.createCell(0);
@@ -401,7 +303,31 @@ public class Excel {
         Cell celda04=filaNueva.createCell(4);
         celda04.setCellValue(Pais);
     }
+    public boolean DuplicadoTabla(DefaultTableModel model,Object[]ListaColumna){
+        if(model.getRowCount()==0){
+            return false;
+        }
+        boolean duplicado=true;
+        //System.out.println(model.getColumnCount());
+        for (int i = 0; i <model.getRowCount(); i++) {
+             duplicado=true;
+             for (int j = 0; j < 4; j++) {
+               // System.out.println(model.getValueAt(i, j).toString()+","+ListaColumna[j].toString());
+                if(!(ListaColumna[j].toString().equals(model.getValueAt(i, j).toString()))){
+                    duplicado=false;
+                    break;
+                }
+            }
+            if(duplicado!=false){
+               //System.out.println(Arrays.toString(ListaColumna));
+                return true;
+            }
+            
+        }
+    return duplicado;
+    }
     public void añadirConflicto(Object[]ListaColumna,int Fila,String Tipo,String HojaExcel,String Info){
+        
         ListaColumna[0]=Codigo;
         ListaColumna[1]=Fila;
         ListaColumna[2]=Tipo;
@@ -410,9 +336,12 @@ public class Excel {
         boton.setName(Info);
          ListaColumna[4]=boton;
       //  ListaColumna[5]=Info;
-        modelo.addRow(ListaColumna);
-        //System.out.println(HojaExcel);
-        Conflictos.add(Info);
+      //Eliminar duplicados
+       if(DuplicadoTabla(modelo, ListaColumna)!=true){
+            modelo.addRow(ListaColumna);
+            //System.out.println(HojaExcel);
+            Conflictos.add(Info);
+       }
 
     }
     public void TitulosColTEC(Sheet hoja){
@@ -446,64 +375,50 @@ public class Excel {
         celda4.setCellValue("País");
     }
     public void ResolverConflictos(String InfoLinea){
-           // System.out.println(sismos.get(v));
-            
             JButton boton =new JButton("Resolver");
             boton.setName(InfoLinea);
-            //System.out.println(modelo.getRowCount()-1+","+modelo.findColumn("Resolver"));
             modelo.setValueAt(boton, modelo.getRowCount()-1, modelo.findColumn("Resolver"));
     } 
     public boolean GuardarExcelTEC(File archivo) throws IOException{
         File fileC = new File (archivo.getAbsolutePath(),"AutoresTEC y Autores Externos ("+ArchivoEntrada.getName()+").xlsx");
-        try ( // System.out.println(fileC.getAbsolutePath());
+        try ( 
                 FileOutputStream fileout = new FileOutputStream(fileC.getAbsolutePath())) {
                 book2.write(fileout);
                 return true; 
                 
         }
     }
-    String buscaAutorScopus( String[] InfoFila){
+    public String buscaAutorScopus( String[] InfoFila){
          String autor;
          //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
-         //System.out.println(InfoFila[i]);
          for (int i = 0; i < InfoFila.length; i++) {
             //Las iniciales siempre estan en mayuscula y Las iniciales terminan con un punto
             if((InfoFila[i].matches("[A-Z].*")||(InfoFila[i].matches("[Á-Ú].*")))&&((InfoFila[i].matches("(.*)[.]")))){
-              //  System.out.println("ENTRAAAAA");
                  //retornamos el nombre con la(s) iniciale(s)
                  //Antes de la inicial esta el nombre por eso i-1
                  autor=InfoFila[i-1]+" ".concat(InfoFila[i]);
                  return autor;
             }   
          }
-        
         return "No encontrado";
     }
-    String AnalisisAutorScopus( String Autor,String Iniciales){
+    public String AnalisisAutorScopus( String Autor,String Iniciales){
          String autor;
          //Siempre despues del nombre viene una Inicial,identificamos esa inicial para encontrar el nombre
-         //System.out.println(InfoFila[i]);
         //Las iniciales siempre estan en mayuscula y Las iniciales terminan con un punto
         if((Iniciales.matches("[A-Z].*")||(Iniciales.matches("[Á-Ú].*")))&&((Iniciales.matches("(.*)[.]")))){
-          //  System.out.println("ENTRAAAAA");
              //retornamos el nombre con la(s) iniciale(s)
              autor=Autor+" ".concat(Iniciales);
              return autor;
         }
-       
-        
         return "No encontrado";
     } 
-    boolean AnalisisUTec(String[] InfoLinea1){
+    public boolean AnalisisUTec(String[] InfoLinea1){
         String [] InfoLinea=InfoLinea1.clone();
    
         for (int i = 0; i < InfoLinea.length; i++) {
             //Convierte toda la info en minusculas
             InfoLinea[i]=InfoLinea[i].toLowerCase();
-            //Si el nombre contiene Instituto y Costa Rica es TEC
-            if((InfoLinea[i].matches("(.*)instituto(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
-                return true;
-            }
             if((InfoLinea[i].matches("(.*)tecnologico(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
                  return true;
             }
@@ -520,26 +435,24 @@ public class Excel {
                  return true;
             }
             //Casos WoS
-            if((InfoLinea[i].matches("(.*)ins(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
-                return true;
-            }
-            if((InfoLinea[i].matches("(.*)inst(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
-                return true;
-            }
             if((InfoLinea[i].matches("(.*)tecnol(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                return true;
+            }
+            if((InfoLinea[i].matches("(.*)tecno(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
+                return true;
+            }
+            if((InfoLinea[i].matches("(.*)tech(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
                 return true;
             }
         }
         return false; 
-     
     }
   
-    String BuscaPais(String[] InfoLinea) throws MalformedURLException, IOException{
+    public String BuscaPais(String[] InfoLinea) throws MalformedURLException, IOException{
         for (int i = 0; i < InfoLinea.length; i++) {
             String pais=InfoLinea[i];
             //Copia para identificar siglas
             pais=pais.toLowerCase();
-            
             //asegurar que la primer letra del pais sea mayuscula
             pais=pais.replaceFirst(String.valueOf(pais.charAt(0)),String.valueOf(pais.charAt(0)).toUpperCase());
             //Si el pais se conforma de mas palabras
@@ -555,8 +468,6 @@ public class Excel {
                             pais+=" ";
                     }
                 }
-                
-               
             }
             if(Paises.getPaises().contains(pais)){
                 return pais;
@@ -565,35 +476,29 @@ public class Excel {
         //Si no lo encuentra por el nombre lo intenta encontrar por la abreviatutura del pais
         for (int i = 0; i < InfoLinea.length; i++) {
             String[] palab=InfoLinea[i].split(" ");
-                for (int j = 0; j < palab.length; j++) {
-                    //si Todas las letras  son mayus
-                    if(palab[j].equals(palab[j].toUpperCase())){
-                        for (int k = 0; k < Paises.getCodPaises().length; k++) {
-                            if(palab[j].matches(Paises.getCodPaises()[k])){
-                                    return Paises.getCodPaises()[k];
-                            }   
-                        }
-                    } 
-                }
+            for (int j = 0; j < palab.length; j++) {
+                //si Todas las letras  son mayus
+                if(palab[j].equals(palab[j].toUpperCase())){
+                    for (int k = 0; k < Paises.getCodPaises().length; k++) {
+                        if(palab[j].matches(Paises.getCodPaises()[k])){
+                                return Paises.getCodPaises()[k];
+                        }   
+                    }
+                } 
+            }
         }
-        
-        return "No encontrado";
-         
+        return "No encontrado"; 
     }
-    String BuscarU(String[] InfoLinea) {
+    public String BuscarU(String[] InfoLinea) {
         for (int i = 0; i < InfoLinea.length; i++) {
             String infoMinus=InfoLinea[i].toLowerCase();
             if(infoMinus.charAt(0)==' '){
                 infoMinus=infoMinus.replaceFirst(" ", "");
             }
-            //Forest Ecology and Forest Management Group
             if(infoMinus.matches("(.*)univ(.*)")||infoMinus.matches("(.*)inst(.*)")||infoMinus.matches("(.*)cent(.*)")
                 ||infoMinus.matches("(.*)nacional(.*)")||infoMinus.matches("(.*)national(.*)")||infoMinus.matches("(.*)ctr(.*)")||infoMinus.matches("(.*)coll(.*)")){
                 return InfoLinea[i];
             }
-            
-            
-            
             //Universadades nacionales
             for (int j = 0; j < Universidades.getUNacional().length; j++) {
                 //Paraque no pnga en la Universidad el pais
@@ -622,10 +527,8 @@ public class Excel {
         return "No encontrado";
     }
     
-    String buscaEscuela( String[] InfoFila){
-      
+    public String buscaEscuela( String[] InfoFila){
         for (int i = 0; i < InfoFila.length; i++) {
-            
             //Si solo son siglas
              if(InfoFila[i].equals(InfoFila[i].toUpperCase())&&(!InfoFila[i].matches("(.*)[.]"))){
                  return InfoFila[i];
@@ -637,14 +540,9 @@ public class Excel {
                  for (int k = 0; k < Unidades.getFrasesClave().get(j).length; k++) {
                     if(InfoFilaMinus.matches("(.*)"+Unidades.getFrasesClave().get(j)[k]+"(.*)")){
                         return Unidades.getFrasesClave().get(j)[0];
-                    }
-                     
-                 }
-               
-                
-            }
-            
-            
+                    }  
+                 }   
+             }
              //la infomarcion separa por los espacios
             String[] Info=InfoFilaMinus.split(" ");
             //palabras clave
@@ -654,27 +552,21 @@ public class Excel {
                        if(Unidades.getPalabrasClave().get(k)[l].equals(Info[j])){
                            //m.out.println(Unidades.getPalabrasClave().get(k)[0]);
                            return Unidades.getPalabrasClave().get(k)[0];
-                       }
-                        
+                       }  
                     }
-                }
-                
+                } 
             }
-            
-             //\\buscar siglas entre parentesis
-             int Par1=InfoFila[i].indexOf("(");
-             if(Par1!=-1){
-                 
-                 int Par2=InfoFila[i].indexOf(")");
-                 String siglas=InfoFila[i].substring(Par1+1, Par2);
-                 //System.out.println(siglas);
-                 //Este es muy especifico 
-                 if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
-                    ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)||"GASEL".equals(siglas)){
-                    // System.out.println("Reconocida");
-                     return siglas;
-                 }
-                 
+            //\\buscar siglas entre parentesis
+            int Par1=InfoFila[i].indexOf("(");
+            if(Par1!=-1){
+                int Par2=InfoFila[i].indexOf(")");
+                String siglas=InfoFila[i].substring(Par1+1, Par2);
+                //Este es muy especifico 
+                if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
+                   ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)||"GASEL".equals(siglas)){
+                   // System.out.println("Reconocida");
+                    return siglas;
+                }  
             }
             for (int j = 0; j < Info.length; j++) {
                 //Si no encuentra la Unidad de investigacion pone la escula
@@ -693,7 +585,6 @@ public class Excel {
         if("CIDASTH - CENTRO DE INVESTIGACIÓN Y DESARROLLO EN AGRICULTURA SOSTENIBLE PARA EL TRÓPICO HÚMEDO".equals(Escuela)){
             return "3 - CAMPUS TECNOLOGICO LOCAL SAN CARLOS";   
         }
-      
         for (int i = 0; i < InfoFila.length; i++) {
             //Convierte toda la info en minusculas 
             String Info=InfoFila[i].toLowerCase();
@@ -745,26 +636,17 @@ public class Excel {
                 String[] autor=Autores.split("; ");
                   for (int j = 0; j < autor.length; j++) {
                     //guardar el Autor
-                    //System.out.println(autor[j]);
                     AutoresWoS.add(autor[j]);
                     //solo se necesita la info
                     formato=formato.concat(Info);
-                  //  if(j!=autor.length-1)
-                    
                     formato  = formato+"; ";
-                  }
-               //   
+                  } 
               }    
-        }
-        
-        
+        } 
         formato = formato.replaceAll(" ; ", "; ");
-        //System.out.println(formato);
-       // System.out.println("Tamaño:"+formato.length());
-        //System.out.println("cantidad au:"+AutoresWoS.size());
         return formato;
     }
-
+    
     public static ArrayList<String> getConflictos() {
         return Conflictos;
     }
@@ -774,9 +656,6 @@ public class Excel {
 
     public static DefaultTableModel getModelo() {
         return modelo;
-    }
-    
-    
-    
+    }  
 }
 

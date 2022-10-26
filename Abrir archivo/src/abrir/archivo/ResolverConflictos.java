@@ -38,11 +38,14 @@ public class ResolverConflictos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jToolBar1 = new javax.swing.JToolBar();
         jLabel3 = new javax.swing.JLabel();
         Tipo = new javax.swing.JLabel();
         Correccion = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         InfoLinea = new javax.swing.JTextField();
+
+        jToolBar1.setRollover(true);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -101,6 +104,7 @@ public class ResolverConflictos extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -198,5 +202,6 @@ public class ResolverConflictos extends javax.swing.JFrame {
     private javax.swing.JLabel Tipo;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JToolBar jToolBar1;
     // End of variables declaration//GEN-END:variables
 }
