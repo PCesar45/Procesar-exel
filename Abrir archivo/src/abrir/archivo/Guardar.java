@@ -30,7 +30,7 @@ public class Guardar {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
 
-            ex.GuardarExcelTEC(fileToSave);
+            ex.GuardarExcel(fileToSave);
             ExitoGuardar exito=new ExitoGuardar();
             exito.setVisible(true);
         }
