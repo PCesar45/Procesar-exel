@@ -101,7 +101,7 @@ public class Conflictos extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Código", "Fila", "Tipo", "Hoja excel", "Resolver "
+                "Código", "Fila", "Tipo", "Hoja Excel", "Resolver "
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -112,6 +112,7 @@ public class Conflictos extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.setColumnSelectionAllowed(true);
         jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTable1.setEnabled(false);
         jTable1.setName(""); // NOI18N

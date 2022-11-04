@@ -26,6 +26,7 @@ public class Abrir {
         fileChooser.setFileFilter(filter);
         
         int valor = fileChooser.showOpenDialog(fileChooser);
+        
         if (valor == JFileChooser.APPROVE_OPTION) {
             String ruta = fileChooser.getSelectedFile().getAbsolutePath();                                        
             try {

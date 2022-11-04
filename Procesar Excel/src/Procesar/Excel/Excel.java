@@ -70,7 +70,7 @@ public class Excel {
         modelo.addColumn("Codigo");
         modelo.addColumn("Fila");
         modelo.addColumn("Tipo");
-        modelo.addColumn("Excel");
+        modelo.addColumn("Hoja del Excel");
         modelo.addColumn("Resolver");
         //Para guardar el nuevo exel
         //----------------

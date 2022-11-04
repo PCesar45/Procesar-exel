@@ -57,7 +57,7 @@ public class TipoArchivoSelec extends javax.swing.JFrame {
         jRadioButtonMenuItem1.setText("jRadioButtonMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Procesando archivo");
+        setTitle("Tipo de archivo");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setLocation(new java.awt.Point(500, 500));
         setLocationByPlatform(true);
