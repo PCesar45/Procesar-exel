@@ -138,7 +138,7 @@ public class ResolverConflictos extends javax.swing.JFrame {
                 default:
                     throw new AssertionError();
             }
-
+            System.out.println(hoja);
             ArchivoEX.getSheetAt(hoja).getRow(filaExcel-1).getCell(columnaExcel).setCellValue(Correccion.getText());
           //  System.out.println("Aqui");
             dispose();

@@ -52,6 +52,16 @@ public class Excel {
     private static JTable tabla;
     private static DefaultTableModel modelo;
     boolean Utec=false;
+    //boolean HojaEncontrada=false;
+    //hoja del excel donde estan las columnas Código Título Autores con afiliación
+    int numHoja=0;
+    Documento doc;
+    Sheet hoja;
+    Sheet hojaGuardarTEC ;
+    Sheet hojaGuardarInter;
+    //Hoja de sin Univerdades no reconocidas
+    Sheet hojaNoUni;
+    
     public Excel() {
         book2=new XSSFWorkbook(); 
         AutoresWoS=new ArrayList<>();
@@ -62,6 +72,7 @@ public class Excel {
     }
     public String Importar(File archivo, JTable tablaExcep,Documento doc){
         ArchivoEntrada=archivo;
+        this.doc=doc;
         String mensaje="Error en la Importacion";
         tabla=tablaExcep;
         tabla.setModel(modelo);
@@ -72,168 +83,175 @@ public class Excel {
         modelo.addColumn("Tipo");
         modelo.addColumn("Hoja del Excel");
         modelo.addColumn("Resolver");
-        //Para guardar el nuevo exel
+        
+          //Para guardar el nuevo exel
         //----------------
-        Sheet hojaGuardarTEC = book2.createSheet("AutoresTEC");
+        hojaGuardarTEC = book2.createSheet("AutoresTEC");
         //nombres de las columnas del excel nuevo
         TitulosColTEC(hojaGuardarTEC);
-        Sheet hojaGuardarInter= book2.createSheet("Autores Externos");
+        hojaGuardarInter= book2.createSheet("Autores Externos");
         TitulosColExter(hojaGuardarInter);
         //Hoja de sin Univerdades no reconocidas
-        Sheet hojaNoUni= book2.createSheet("Univesidad no reconocida");
+        hojaNoUni= book2.createSheet("Univesidad no reconocida");
         TitulosColExter(hojaNoUni);
         //para la informacion de la Universidad no identicada
         Cell celda5=hojaNoUni.getRow(0).createCell(5);
         celda5.setCellValue("Informacion Completa");
         try {
-            book=new XSSFWorkbook(new FileInputStream(archivo));
-            Sheet hoja=book.getSheetAt(0);
-            Iterator FilaIterator=hoja.rowIterator();
-            float Porciento=(float)100/(hoja.getLastRowNum());
-            int contAutoresWoS=-1;
-            int NumCol=0;
-            //Para que cuando entre en el ciclo la primer fila sea el IndiceFila=0
-            int IndiceFila=-1;
-            int ContFilasTEC=1;
-            int ContFilasExtern=1;
-            int ContFilasNoUni=1;
-            //VA SER VERDADERO SI EXISTEN FILAS POR RECORRER
-            while (FilaIterator.hasNext()) {                
-                //INDICE FILA AUMENTA 1 POR CADA RECORRIDO
-                IndiceFila++;
-                Row fila=(Row)FilaIterator.next();
-                //ASIGNAMOS
-                Object[]ListaColumna=new Object[6];
-               //el indice columna vuelve a 0 en cada cambio de fila
-                int IndiceColumna=-1;
-                
-                //si es la primer fila localizamos en que columna va a estar el codigo ,titulo y Autores con afiliación por medio del nombre de las columnas
-                if (IndiceFila==0){
-                    //numero de columnas y identificar las columnas
-                    NumCol=IdenNomDeCol_Y_numCol(fila);
-                    // System.out.println(columnaCodigo+","+columnaTitulo+","+columnaAutoresConAfi);
-                }else{
-                while (IndiceColumna!=NumCol-1) {       
-                    //INDICE COLUMNA AUMENTA 1 POR CADA RECORRIDO
-                    IndiceColumna++;
-                    Cell celda=(Cell)fila.getCell(IndiceColumna);   
-                    //contenido de la fila
-                    //Saca el codigo y lo guarda temporalmente esto cambia en cada fila
-                    if(IndiceColumna==columnaCodigo){
-                       // System.out.println(celda.getStringCellValue());
-                        Codigo=celda.getStringCellValue();
+            book=new XSSFWorkbook(new FileInputStream(ArchivoEntrada));
+            ProcesarExcel();
+        } catch (IOException | EncryptedDocumentException e){}
+        return mensaje;
+    }
+    public void ProcesarExcel() throws FileNotFoundException, IOException{
+       
+        //hoja del excel donde estan las columnas Código Título Autores con afiliación
+        hoja=book.getSheetAt(numHoja);
+        Iterator FilaIterator=hoja.rowIterator();
+        float Porciento=(float)100/(hoja.getLastRowNum());
+        int contAutoresWoS=-1;
+        int NumCol=0;
+        //Para que cuando entre en el ciclo la primer fila sea el IndiceFila=0
+        int IndiceFila=-1;
+        int ContFilasTEC=1;
+        int ContFilasExtern=1;
+        int ContFilasNoUni=1;
+        //VA SER VERDADERO SI EXISTEN FILAS POR RECORRER
+        while (FilaIterator.hasNext()) {                
+            //INDICE FILA AUMENTA 1 POR CADA RECORRIDO
+            IndiceFila++;
+            Row fila=(Row)FilaIterator.next();
+            //ASIGNAMOS
+            Object[]ListaColumna=new Object[6];
+           //el indice columna vuelve a 0 en cada cambio de fila
+            int IndiceColumna=-1;
+
+            //si es la primer fila localizamos en que columna va a estar el codigo ,titulo y Autores con afiliación por medio del nombre de las columnas
+            if (IndiceFila==0){
+                //numero de columnas y identificar las columnas
+                NumCol=IdenNomDeCol_Y_numCol(fila);
+                // System.out.println(columnaCodigo+","+columnaTitulo+","+columnaAutoresConAfi);
+            }else{
+            while (IndiceColumna!=NumCol-1) {       
+                //INDICE COLUMNA AUMENTA 1 POR CADA RECORRIDO
+                IndiceColumna++;
+                Cell celda=(Cell)fila.getCell(IndiceColumna);   
+                //contenido de la fila
+                //Saca el codigo y lo guarda temporalmente esto cambia en cada fila
+                if(IndiceColumna==columnaCodigo){
+                   // System.out.println(celda.getStringCellValue());
+                    Codigo=celda.getStringCellValue();
+                }
+                //Saca el titulo y lo guarda temporalmente
+                if(IndiceColumna==columnaTitulo){
+                    Titulo=celda.getStringCellValue();
+                }
+                //Saca toda la informacion de Authors with affiliations y la guarda en una variable para posteriomente procesarla
+                if(IndiceColumna==columnaAutoresConAfi){
+                    AutoresConAfi=celda.getStringCellValue();
+                    //Si se trata de Wos aqui se le dara el mismo formato que Scopus
+                    if(doc==Documento.WoS){
+                        AutoresConAfi=DarFormato(AutoresConAfi);
                     }
-                    //Saca el titulo y lo guarda temporalmente
-                    if(IndiceColumna==columnaTitulo){
-                        Titulo=celda.getStringCellValue();
-                    }
-                    //Saca toda la informacion de Authors with affiliations y la guarda en una variable para posteriomente procesarla
-                    if(IndiceColumna==columnaAutoresConAfi){
-                        AutoresConAfi=celda.getStringCellValue();
-                        //Si se trata de Wos aqui se le dara el mismo formato que Scopus
-                        if(doc==Documento.WoS){
-                            AutoresConAfi=DarFormato(AutoresConAfi);
-                        }
-                        //Aqui se va a analizar y separar la columan de Autores con afiliacion
-                        //s voy a separar la informacion por ; y lo guardo en un arraylist
-                        String[] AutoresConAfiDiv1 = AutoresConAfi.split("; ");   
-                        for (int i = 0; i < AutoresConAfiDiv1.length; i++) {
-                            contAutoresWoS++;
-                            // voy a separar la informacion por comas y lo guardo en un arraylist
-                            String[] AutoresConAfiDiv2 = AutoresConAfiDiv1[i].split(", ");
-                            //Se identifica si la informacion se trata del TEC
-                            Utec=AnalisisUTec(AutoresConAfiDiv2);
-                            for (int j = 0; j < AutoresConAfiDiv2.length; j++) {
-                                //si es un Excel scopus
-                                if(doc==Documento.scopus){
-                                    //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
-                                    if(AutoresConAfiDiv2.length>=2){
-                                        if(!"No encontrado".equals(AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]))){
-                                            Autor=AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]);
-                                        }else{//en caso de que no lo encuentre lo busca en toda la linea 
-                                            if(!"No encontrado".equals(buscaAutorScopus(AutoresConAfiDiv2))){
-                                                Autor=buscaAutorScopus(AutoresConAfiDiv2);
+                    //Aqui se va a analizar y separar la columan de Autores con afiliacion
+                    //s voy a separar la informacion por ; y lo guardo en un arraylist
+                    String[] AutoresConAfiDiv1 = AutoresConAfi.split("; ");   
+                    for (int i = 0; i < AutoresConAfiDiv1.length; i++) {
+                        contAutoresWoS++;
+                        // voy a separar la informacion por comas y lo guardo en un arraylist
+                        String[] AutoresConAfiDiv2 = AutoresConAfiDiv1[i].split(", ");
+                        //Se identifica si la informacion se trata del TEC
+                        Utec=AnalisisUTec(AutoresConAfiDiv2);
+                        for (int j = 0; j < AutoresConAfiDiv2.length; j++) {
+                            //si es un Excel scopus
+                            if(doc==Documento.scopus){
+                                //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
+                                if(AutoresConAfiDiv2.length>=2){
+                                    if(!"No encontrado".equals(AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]))){
+                                        Autor=AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]);
+                                    }else{//en caso de que no lo encuentre lo busca en toda la linea 
+                                        if(!"No encontrado".equals(buscaAutorScopus(AutoresConAfiDiv2))){
+                                            Autor=buscaAutorScopus(AutoresConAfiDiv2);
+                                        }
+                                        else{
+                                            // si del todo no lo encuentra  lo mandaria a excepciones 
+                                            Autor="No encontrado";
+                                            if(Utec){
+                                                añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AutoresConAfiDiv1[i]);
                                             }
                                             else{
-                                                // si del todo no lo encuentra  lo mandaria a excepciones 
-                                                Autor="No encontrado";
-                                                if(Utec){
-                                                    añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AutoresConAfiDiv1[i]);
-                                                }
-                                                else{
-                                                    añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Internacionales",AutoresConAfiDiv1[i]);
-                                                }
+                                                añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Externos",AutoresConAfiDiv1[i]);
                                             }
                                         }
                                     }
                                 }
-                                //Si no es Scopus es WoS
-                                else{
-                                    //Guarda el autor del excel WoS o ESCI
-                                    Autor=AutoresWoS.get(contAutoresWoS);
-                                }
-                                //si la informacion es del TEC saca la escuela, campus ,universidad y país
-                                if(Utec){
-                                    //Escuela
-                                    String resultadoEscuela=buscaEscuela(AutoresConAfiDiv2);
-                                    if(!"No encontrado".equals(resultadoEscuela)){
-                                        Escuela=resultadoEscuela;
-                                    }
-                                    else{
-                                        //Estos a excepciones
-                                        Escuela="No encontrado";
-                                        añadirConflicto(ListaColumna,ContFilasTEC+1,"Escuela o Unidad","AutoresTEC",AutoresConAfiDiv1[i]);
-                                    }
-                                    //Buscar el campus
-                                    String resultadoCampus=buscaCampus(AutoresConAfiDiv2);
-                                    if(!"No encontrado".equals(resultadoCampus)){
-                                        Campus=resultadoCampus;
-                                    }
-                                    else{
-                                        Campus="No encontrado";
-                                        añadirConflicto(ListaColumna,ContFilasTEC+1,"Campus","AutoresTEC",AutoresConAfiDiv1[i]);
-                                    }
-                                    //Universidad y Pais autores TEC son fijos
-                                    Universidad="Instituto Tecnologico de Costa Rica";
-                                    Pais="Costa Rica";
-                                    GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
-                                    ContFilasTEC++;
-                                    //necesario para evitar repetidos
-                                    break;
-                                }else{//Autores externos
-                                    //Analizar Pais
-                                    Pais=BuscaPais(AutoresConAfiDiv2);
-                                    if("No encontrado".equals(Pais)){
-                                        añadirConflicto(ListaColumna,ContFilasExtern+1,"País","Autores Internacionales",AutoresConAfiDiv1[i]);
-                                    }
-                                    //Buscar Universidad
-                                    Universidad=BuscarU(AutoresConAfiDiv2);
-                                    if("No encontrado".equals(Universidad)){
-                                        añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AutoresConAfiDiv1[i]);
-                                        GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
-                                        Cell celda05=hojaNoUni.getRow(ContFilasNoUni).createCell(5);
-                                        celda05.setCellValue(AutoresConAfiDiv1[i]);
-                                        ContFilasNoUni++;
-                                    }
-                                    //Si no encuentra la universidad manda esa informacion a una hoja por aparte (Universidad no reconocida)
-                                    else{
-                                        GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
-                                        ContFilasExtern++;
-                                    }
-                                    break;
-                                }   
                             }
+                            //Si no es Scopus es WoS
+                            else{
+                                //Guarda el autor del excel WoS o ESCI
+                                Autor=AutoresWoS.get(contAutoresWoS);
+                            }
+                            //si la informacion es del TEC saca la escuela, campus ,universidad y país
+                            if(Utec){
+                                //Escuela
+                                String resultadoEscuela=buscaEscuela(AutoresConAfiDiv2);
+                                if(!"No encontrado".equals(resultadoEscuela)){
+                                    Escuela=resultadoEscuela;
+                                }
+                                else{
+                                    //Estos a excepciones
+                                    Escuela="No encontrado";
+                                    añadirConflicto(ListaColumna,ContFilasTEC+1,"Escuela o Unidad","AutoresTEC",AutoresConAfiDiv1[i]);
+                                }
+                                //Buscar el campus
+                                String resultadoCampus=buscaCampus(AutoresConAfiDiv2);
+                                if(!"No encontrado".equals(resultadoCampus)){
+                                    Campus=resultadoCampus;
+                                }
+                                else{
+                                    Campus="No encontrado";
+                                    añadirConflicto(ListaColumna,ContFilasTEC+1,"Campus","AutoresTEC",AutoresConAfiDiv1[i]);
+                                }
+                                //Universidad y Pais autores TEC son fijos
+                                Universidad="Instituto Tecnologico de Costa Rica";
+                                Pais="Costa Rica";
+                                GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
+                                ContFilasTEC++;
+                                //necesario para evitar repetidos
+                                break;
+                            }else{//Autores externos
+                                //Analizar Pais
+                                Pais=BuscaPais(AutoresConAfiDiv2);
+                                if("No encontrado".equals(Pais)){
+                                    añadirConflicto(ListaColumna,ContFilasExtern+1,"País","Autores Externos",AutoresConAfiDiv1[i]);
+                                }
+                                //Buscar Universidad
+                                Universidad=BuscarU(AutoresConAfiDiv2);
+                                if("No encontrado".equals(Universidad)){
+                                    añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AutoresConAfiDiv1[i]);
+                                    GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
+                                    Cell celda05=hojaNoUni.getRow(ContFilasNoUni).createCell(5);
+                                    celda05.setCellValue(AutoresConAfiDiv1[i]);
+                                    ContFilasNoUni++;
+                                }
+                                //Si no encuentra la universidad manda esa informacion a una hoja por aparte (Universidad no reconocida)
+                                else{
+                                    GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
+                                    ContFilasExtern++;
+                                }
+                                break;
+                            }   
                         }
                     }
                 }
             }
-            //Barra de progreso
-            Cargando.getjProgressBar1().setValue((int) (Porciento*(IndiceFila+1)));
-            Cargando.getjProgressBar1().setString(String.valueOf((int) (Porciento*(IndiceFila+1)))+"%");
         }
-            mensaje="Importacion Exitosa";
-        } catch (IOException | EncryptedDocumentException e){}
-        return mensaje;
+
+        //Barra de progreso
+        Cargando.getjProgressBar1().setValue((int) (Porciento*(IndiceFila+1)));
+        Cargando.getjProgressBar1().setString(String.valueOf((int) (Porciento*(IndiceFila+1)))+"%");
+    }
+        
     }
     public String QuitaTildes(String palabra){
         palabra=palabra.replaceAll("á", "a");
@@ -243,7 +261,7 @@ public class Excel {
         palabra=palabra.replaceAll("ú", "u");
         return palabra;
     }
-    public int IdenNomDeCol_Y_numCol(Row fila){
+    public int IdenNomDeCol_Y_numCol(Row fila) throws IOException{
         Iterator ColumnaIterator=fila.cellIterator();
         int numeroDeColumnas=0;
        
@@ -253,6 +271,7 @@ public class Excel {
             String infoCelda=QuitaTildes(celda.getStringCellValue().toLowerCase());
             //Quitar los espacios al final
             infoCelda=infoCelda.trim();
+            System.out.println(infoCelda);
             switch (infoCelda) {
                 //Estandar
                 case("codigo"):
@@ -271,8 +290,17 @@ public class Excel {
         }
        //Si no encuentra alguna columna ,pone un mensaje de error con indicaciones  y se sale 
         if(columnaCodigo==-1||columnaTitulo==-1||columnaAutoresConAfi==-1){
-            JOptionPane.showMessageDialog(null, "Nombres de las columnas del archivo fuente deben ser repectivamente:\n\nCódigo|Título|Autores con afiliación\n\nTambién deben estar en la primer fila del Excel y la hoja a procesar siempre debe estar de primero\nPor favor corrija los nombres de las columnas y vuelva a abrir el archivo","Nombres de las columnas del archivo fuente incorrectas",JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            //Para que busque  en las otras hojas del Excel 
+            if(numHoja<(book.getNumberOfSheets()-1)){
+                numHoja++;
+                System.out.println("numHoja:"+numHoja);
+                ProcesarExcel();
+                return 0;
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Nombres de las columnas del archivo fuente deben ser repectivamente:\n\nCódigo|Título|Autores con afiliación\n\nTambien es necesario que los nombres de las columnas deben estar en la primer fila del Excel\nPor favor corrija los nombres de las columnas y vuelva a abrir el archivo\n\n \t ¡Recuerde guardar el Excel despues de realizar los cambios!\n\n ","Nombres de las columnas del archivo fuente incorrectas",JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
+            }
         }
        return numeroDeColumnas;
     }
