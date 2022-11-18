@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
- * En esta clase se abre la ventana con el texto co la infarmacion que no se logro reconocer para que el usuario lo reconozca
+ * En esta clase se abre la ventana con el texto co la infarmacion que no se logro reconocer para que el usuario lo reconozca 
  * @author Pablo
  *  
  */
