@@ -136,114 +136,117 @@ public class Excel {
                 while (IndiceColumna!=NumCol-1) {       
                     //INDICE COLUMNA AUMENTA 1 POR CADA RECORRIDO
                     IndiceColumna++;
-                    Cell celda=(Cell)fila.getCell(IndiceColumna);   
-                    //contenido de la fila
-                    //Saca el codigo y lo guarda temporalmente esto cambia en cada fila
-                    if(IndiceColumna==columnaCodigo){
-                        Codigo=celda.getStringCellValue();
-                    }
-                    //Saca el titulo y lo guarda temporalmente
-                    if(IndiceColumna==columnaTitulo){
-                        Titulo=celda.getStringCellValue();
-                    }
-                    //Saca toda la informacion de Authors with affiliations y la guarda en una variable para posteriomente procesarla
-                    if(IndiceColumna==columnaAutoresConAfi){
-                        AutoresConAfi=celda.getStringCellValue();
-                        //Si se trata de Wos aqui se le dara el mismo formato que Scopus
-                        if(doc==Documento.WoS){
-                            AutoresConAfi=DarFormato(AutoresConAfi);
+                    Cell celda=(Cell)fila.getCell(IndiceColumna);  
+                    if(celda!=null){
+                        //contenido de la fila
+                        //Saca el codigo y lo guarda temporalmente esto cambia en cada fila
+                        if(IndiceColumna==columnaCodigo){
+                            Codigo=celda.getStringCellValue();
                         }
-                        //Aqui se va a analizar y separar la columan de Autores con afiliacion
-                        //s voy a separar la informacion por ; y lo guardo en un arraylist
-                        String[] AutoresConAfiDiv1 = AutoresConAfi.split("; ");   
-                        for (int i = 0; i < AutoresConAfiDiv1.length; i++) {
-                            contAutoresWoS++;
-                            // voy a separar la informacion por comas y lo guardo en un arraylist
-                            String[] AutoresConAfiDiv2 = AutoresConAfiDiv1[i].split(", ");
-                            //Se identifica si la informacion se trata del TEC
-                            Utec=AnalisisUTec(AutoresConAfiDiv2);
-                            for (int j = 0; j < AutoresConAfiDiv2.length; j++) {
-                                //si es un Excel scopus
-                                if(doc==Documento.scopus){
-                                    //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
-                                    if(AutoresConAfiDiv2.length>=2){
-                                        if(!"No encontrado".equals(AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]))){
-                                            Autor=AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]);
-                                        }else{//en caso de que no lo encuentre lo busca en toda la linea 
-                                            if(!"No encontrado".equals(buscaAutorScopus(AutoresConAfiDiv2))){
-                                                Autor=buscaAutorScopus(AutoresConAfiDiv2);
-                                            }
-                                            else{
-                                                // si del todo no lo encuentra  lo mandaria a excepciones 
-                                                Autor="No encontrado";
-                                                if(Utec){
-                                                    añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AutoresConAfiDiv1[i]);
+                        //Saca el titulo y lo guarda temporalmente
+                        if(IndiceColumna==columnaTitulo){
+                            Titulo=celda.getStringCellValue();
+                        }
+                        //Saca toda la informacion de Authors with affiliations y la guarda en una variable para posteriomente procesarla
+                        if(IndiceColumna==columnaAutoresConAfi){
+                            AutoresConAfi=celda.getStringCellValue();
+                            //Si se trata de Wos aqui se le dara el mismo formato que Scopus
+                            if(doc==Documento.WoS){
+                                AutoresConAfi=DarFormato(AutoresConAfi);
+                            }
+                            //Aqui se va a analizar y separar la columan de Autores con afiliacion
+                            //s voy a separar la informacion por ; y lo guardo en un arraylist
+                            String[] AutoresConAfiDiv1 = AutoresConAfi.split("; ");   
+                            for (int i = 0; i < AutoresConAfiDiv1.length; i++) {
+                                contAutoresWoS++;
+                                // voy a separar la informacion por comas y lo guardo en un arraylist
+                                String[] AutoresConAfiDiv2 = AutoresConAfiDiv1[i].split(", ");
+                                //Se identifica si la informacion se trata del TEC
+                                Utec=AnalisisUTec(AutoresConAfiDiv2);
+                                for (int j = 0; j < AutoresConAfiDiv2.length; j++) {
+                                    //si es un Excel scopus
+                                    if(doc==Documento.scopus){
+                                        //Analizar Autor Comprueba si de verdad es un autor y ademas lo une con las iniciales
+                                        if(AutoresConAfiDiv2.length>=2){
+                                            if(!"No encontrado".equals(AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]))){
+                                                Autor=AnalisisAutorScopus(AutoresConAfiDiv2[0],AutoresConAfiDiv2[1]);
+                                            }else{//en caso de que no lo encuentre lo busca en toda la linea 
+                                                if(!"No encontrado".equals(buscaAutorScopus(AutoresConAfiDiv2))){
+                                                    Autor=buscaAutorScopus(AutoresConAfiDiv2);
                                                 }
                                                 else{
-                                                    añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Externos",AutoresConAfiDiv1[i]);
+                                                    // si del todo no lo encuentra  lo mandaria a excepciones 
+                                                    Autor="No encontrado";
+                                                    if(Utec){
+                                                        añadirConflicto(ListaColumna,ContFilasTEC+1,"Autor","AutoresTEC",AutoresConAfiDiv1[i]);
+                                                    }
+                                                    else{
+                                                        añadirConflicto(ListaColumna,ContFilasExtern+1,"Autor","Autores Externos",AutoresConAfiDiv1[i]);
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                    //Si no es Scopus es WoS
+                                    else{
+                                        //Guarda el autor del excel WoS o ESCI
+                                        Autor=AutoresWoS.get(contAutoresWoS);
+                                    }
+                                    //si la informacion es del TEC saca la escuela, campus ,universidad y país
+                                    if(Utec){
+                                        //Escuela
+                                        String resultadoEscuela=buscaEscuela(AutoresConAfiDiv2);
+                                        if(!"No encontrado".equals(resultadoEscuela)){
+                                            Escuela=resultadoEscuela;
+                                        }
+                                        else{
+                                            //Estos a excepciones
+                                            Escuela="No encontrado";
+                                            añadirConflicto(ListaColumna,ContFilasTEC+1,"Escuela o Unidad","AutoresTEC",AutoresConAfiDiv1[i]);
+                                        }
+                                        //Buscar el campus
+                                        String resultadoCampus=buscaCampus(AutoresConAfiDiv2);
+                                        if(!"No encontrado".equals(resultadoCampus)){
+                                            Campus=resultadoCampus;
+                                        }
+                                        else{
+                                            Campus="No encontrado";
+                                            añadirConflicto(ListaColumna,ContFilasTEC+1,"Campus","AutoresTEC",AutoresConAfiDiv1[i]);
+                                        }
+                                        //Universidad y Pais autores TEC son fijos
+                                        Universidad="Instituto Tecnologico de Costa Rica";
+                                        Pais="Costa Rica";
+                                        GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
+                                        ContFilasTEC++;
+                                        //necesario para evitar repetidos
+                                        break;
+                                    }else{//Autores externos
+                                        //Analizar Pais
+                                        Pais=BuscaPais(AutoresConAfiDiv2);
+                                        if("No encontrado".equals(Pais)){
+                                            añadirConflicto(ListaColumna,ContFilasExtern+1,"País","Autores Externos",AutoresConAfiDiv1[i]);
+                                        }
+                                        //Buscar Universidad
+                                        Universidad=BuscarU(AutoresConAfiDiv2);
+                                        if("No encontrado".equals(Universidad)){
+                                            añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AutoresConAfiDiv1[i]);
+                                            GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
+                                            Cell celda05=hojaNoUni.getRow(ContFilasNoUni).createCell(5);
+                                            celda05.setCellValue(AutoresConAfiDiv1[i]);
+                                            ContFilasNoUni++;
+                                        }
+                                        //Si no encuentra la universidad manda esa informacion a una hoja por aparte (Universidad no reconocida)
+                                        else{
+                                            GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
+                                            ContFilasExtern++;
+                                        }
+                                        break;
+                                    }   
                                 }
-                                //Si no es Scopus es WoS
-                                else{
-                                    //Guarda el autor del excel WoS o ESCI
-                                    Autor=AutoresWoS.get(contAutoresWoS);
-                                }
-                                //si la informacion es del TEC saca la escuela, campus ,universidad y país
-                                if(Utec){
-                                    //Escuela
-                                    String resultadoEscuela=buscaEscuela(AutoresConAfiDiv2);
-                                    if(!"No encontrado".equals(resultadoEscuela)){
-                                        Escuela=resultadoEscuela;
-                                    }
-                                    else{
-                                        //Estos a excepciones
-                                        Escuela="No encontrado";
-                                        añadirConflicto(ListaColumna,ContFilasTEC+1,"Escuela o Unidad","AutoresTEC",AutoresConAfiDiv1[i]);
-                                    }
-                                    //Buscar el campus
-                                    String resultadoCampus=buscaCampus(AutoresConAfiDiv2);
-                                    if(!"No encontrado".equals(resultadoCampus)){
-                                        Campus=resultadoCampus;
-                                    }
-                                    else{
-                                        Campus="No encontrado";
-                                        añadirConflicto(ListaColumna,ContFilasTEC+1,"Campus","AutoresTEC",AutoresConAfiDiv1[i]);
-                                    }
-                                    //Universidad y Pais autores TEC son fijos
-                                    Universidad="Instituto Tecnologico de Costa Rica";
-                                    Pais="Costa Rica";
-                                    GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
-                                    ContFilasTEC++;
-                                    //necesario para evitar repetidos
-                                    break;
-                                }else{//Autores externos
-                                    //Analizar Pais
-                                    Pais=BuscaPais(AutoresConAfiDiv2);
-                                    if("No encontrado".equals(Pais)){
-                                        añadirConflicto(ListaColumna,ContFilasExtern+1,"País","Autores Externos",AutoresConAfiDiv1[i]);
-                                    }
-                                    //Buscar Universidad
-                                    Universidad=BuscarU(AutoresConAfiDiv2);
-                                    if("No encontrado".equals(Universidad)){
-                                        añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AutoresConAfiDiv1[i]);
-                                        GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
-                                        Cell celda05=hojaNoUni.getRow(ContFilasNoUni).createCell(5);
-                                        celda05.setCellValue(AutoresConAfiDiv1[i]);
-                                        ContFilasNoUni++;
-                                    }
-                                    //Si no encuentra la universidad manda esa informacion a una hoja por aparte (Universidad no reconocida)
-                                    else{
-                                        GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
-                                        ContFilasExtern++;
-                                    }
-                                    break;
-                                }   
                             }
                         }
                     }
+               
                 }
             }
 
@@ -251,8 +254,8 @@ public class Excel {
             Cargando.getjProgressBar1().setValue((int) (Porciento*(IndiceFila+1)));
             Cargando.getjProgressBar1().setString(String.valueOf((int) (Porciento*(IndiceFila+1)))+"%");
         }
-    }catch (IndexOutOfBoundsException | PatternSyntaxException e) {
-        JOptionPane.showMessageDialog(null, "Error,Asegurese de seleccionar correctamente el tipo de archivo","Error",JOptionPane.ERROR_MESSAGE);
+    }catch (IndexOutOfBoundsException | PatternSyntaxException |NullPointerException e) {
+        JOptionPane.showMessageDialog(null, "Error,Asegurese de seleccionar correctamente el tipo de archivo y el archivo correcto","Error",JOptionPane.ERROR_MESSAGE);
         System.exit(0);
     }
         

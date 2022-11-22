@@ -255,12 +255,7 @@ public class TipoArchivoSelec extends javax.swing.JFrame {
             };
 
             Thread hilo=new Thread(runnable);
-            hilo.start();
-           
-            
-            
-            
-            
+            hilo.start();       
         }
         
     }

@@ -27,9 +27,29 @@ public class Guardar {
         int userSelection = fileChooser.showSaveDialog(parentFrame);
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
+            
+            //ventana donde se ve la barra de progreso
+            Cargando cargando = new Cargando();
+            cargando.setTitle("Guardando");
+            cargando.setVisible(true);
+            Runnable runnable = new Runnable() {
+               @Override
+               public void run() {
+                    //boolean bandera=true;
+                    int i=0;
+                    while(i!=100){
+                        Cargando.getjProgressBar1().setValue(i);
+                        i++;
+                    }
+                    cargando.dispose();
+               }
+            };
             File fileToSave = fileChooser.getSelectedFile();
-
+            
             ex.GuardarExcel(fileToSave);
+
+            Thread hilo=new Thread(runnable);
+            hilo.start();    
             ExitoGuardar exito=new ExitoGuardar();
             exito.setVisible(true);
         }
