@@ -249,13 +249,15 @@ public class Excel {
                
                 }
             }
-
             //Barra de progreso
             Cargando.getjProgressBar1().setValue((int) (Porciento*(IndiceFila+1)));
             Cargando.getjProgressBar1().setString(String.valueOf((int) (Porciento*(IndiceFila+1)))+"%");
         }
-    }catch (IndexOutOfBoundsException | PatternSyntaxException |NullPointerException e) {
+    }catch (IndexOutOfBoundsException | PatternSyntaxException|NullPointerException  e) {
         JOptionPane.showMessageDialog(null, "Error,Asegurese de seleccionar correctamente el tipo de archivo y el archivo correcto","Error",JOptionPane.ERROR_MESSAGE);
+        System.exit(0);
+    }catch(Exception e){
+        JOptionPane.showMessageDialog(null, "Error en el procesamiento","Error",JOptionPane.ERROR_MESSAGE);
         System.exit(0);
     }
         
@@ -269,38 +271,37 @@ public class Excel {
         return palabra;
     }
     public int IdenNomDeCol_Y_numCol(Row fila) throws IOException{
-        Iterator ColumnaIterator=fila.cellIterator();
         int numeroDeColumnas=0;
-       
-        while (ColumnaIterator.hasNext()) {
-            Cell celda=(Cell)ColumnaIterator.next();
-            
-            
-            try {
-                //Quita las tildes y converte todo a miniscula 
-                String infoCelda=QuitaTildes(celda.getStringCellValue().toLowerCase());
-                //Quitar los espacios al final
-            infoCelda=infoCelda.trim();
-            switch (infoCelda) {
-                //Estandar
-                case("codigo"):
-                    columnaCodigo=numeroDeColumnas;
-                    break;
-                case "titulo":
-                    columnaTitulo=numeroDeColumnas;
-                    break;
-                case "autores con afiliacion":
-                    columnaAutoresConAfi=numeroDeColumnas;
-                    break;
-                default:                                    
-                    break;
+        for (int i = 0; i < fila.getLastCellNum(); i++){
+            Cell celda=fila.getCell(i);
+            if(celda!=null){
+                if(celda.getCellType()!=Cell.CELL_TYPE_FORMULA){
+                    try {
+                        //Quita las tildes y converte todo a miniscula 
+                        String infoCelda=QuitaTildes(celda.getStringCellValue().toLowerCase());
+                        //Quitar los espacios al final
+                        infoCelda=infoCelda.trim();
+                        switch (infoCelda) {
+                            //Estandar
+                            case("codigo"):
+                                columnaCodigo=numeroDeColumnas;
+                                break;
+                            case "titulo":
+                                columnaTitulo=numeroDeColumnas;
+                                break;
+                            case "autores con afiliacion":
+                                columnaAutoresConAfi=numeroDeColumnas;
+                                break;
+                            default:                                    
+                                break;
+                        }
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Error al procesar el Excel ,cerciorese de que esta abriendo el archivo correcto","Error al procesar el Excel",JOptionPane.ERROR_MESSAGE);
+                        System.exit(0);
+                    }
+                }
             }
             numeroDeColumnas++;
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Error al procesar el Excel ,cerciorese de que esta abriendo el archivo correcto","Error al procesar el Excel",JOptionPane.ERROR_MESSAGE);
-                System.exit(0);
-            }
-            
         }
        //Si no encuentra alguna columna ,pone un mensaje de error con indicaciones  y se sale 
         if(columnaCodigo==-1||columnaTitulo==-1||columnaAutoresConAfi==-1){

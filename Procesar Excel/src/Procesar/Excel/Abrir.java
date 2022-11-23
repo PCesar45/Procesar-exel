@@ -49,6 +49,7 @@ public class Abrir {
             }
         } else {
             System.out.println("No se ha seleccionado ningún fichero");
+            System.exit(0);
         }
     }
     
