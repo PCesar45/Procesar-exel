@@ -216,7 +216,7 @@ public class Excel {
                                         //Universidad y Pais autores TEC son fijos
                                         Universidad="Instituto Tecnologico de Costa Rica";
                                         Pais="Costa Rica";
-                                        GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC);
+                                        GuardarFilaAuTEC(hojaGuardarTEC,ContFilasTEC,AutoresConAfiDiv1[i]);
                                         ContFilasTEC++;
                                         //necesario para evitar repetidos
                                         break;
@@ -230,14 +230,14 @@ public class Excel {
                                         Universidad=BuscarU(AutoresConAfiDiv2);
                                         if("No encontrado".equals(Universidad)){
                                             añadirConflicto(ListaColumna,ContFilasNoUni+1,"Universidad","Univesidad no reconocida",AutoresConAfiDiv1[i]);
-                                            GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni);
+                                            GuardarFilaAuExtern(hojaNoUni,ContFilasNoUni,"");
                                             Cell celda05=hojaNoUni.getRow(ContFilasNoUni).createCell(5);
                                             celda05.setCellValue(AutoresConAfiDiv1[i]);
                                             ContFilasNoUni++;
                                         }
                                         //Si no encuentra la universidad manda esa informacion a una hoja por aparte (Universidad no reconocida)
                                         else{
-                                            GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern);
+                                            GuardarFilaAuExtern(hojaGuardarInter,ContFilasExtern,AutoresConAfiDiv1[i]);
                                             ContFilasExtern++;
                                         }
                                         break;
@@ -319,7 +319,7 @@ public class Excel {
        return numeroDeColumnas;
     }
     //Guarda una nueva fila en la hoja de AutoresTEC
-    public void GuardarFilaAuTEC(Sheet hoja,int fila){
+    public void GuardarFilaAuTEC(Sheet hoja,int fila,String infocompleta){
         //Si alguno llega en null quierie decir que hubo un error probablemente en el orden de las columnas
         if(Codigo==null||Titulo==null||Autor==null||Escuela==null||Campus==null||Universidad==null||Pais==null){
             JOptionPane.showMessageDialog(null, "El orden de las columnas del archivo fuente deben estar en el siguente orden:\n\nCódigo|Título|Autores con afiliación\n\nPor favor corrija el orden de las columnas y vuelva a abrir el archivo","El orden de las columnas",JOptionPane.ERROR_MESSAGE);
@@ -340,9 +340,11 @@ public class Excel {
         celda05.setCellValue(Universidad);
         Cell celda06=filaNueva.createCell(6);
         celda06.setCellValue(Pais);
+        Cell celda07=filaNueva.createCell(7);
+        celda07.setCellValue(infocompleta);
     }
     //Guarda una nueva fila en la hoja de Autores Externos
-    public void GuardarFilaAuExtern(Sheet hoja,int fila){
+    public void GuardarFilaAuExtern(Sheet hoja,int fila,String infocompleta){
         Row filaNueva=hoja.createRow(fila);
         Cell celda00=filaNueva.createCell(0);
         celda00.setCellValue(Codigo);
@@ -354,6 +356,8 @@ public class Excel {
         celda03.setCellValue(Universidad);
         Cell celda04=filaNueva.createCell(4);
         celda04.setCellValue(Pais);
+        Cell celda05=filaNueva.createCell(5);
+        celda05.setCellValue(infocompleta);
     }
     //Filtra que no vaya filas duplicadas a la Jtable de conflictos
     public boolean DuplicadoTabla(DefaultTableModel model,Object[]ListaColumna){
@@ -410,6 +414,8 @@ public class Excel {
         celda5.setCellValue("Universidad");
         Cell celda6=fila1.createCell(6);
         celda6.setCellValue("País");
+        Cell celda7=fila1.createCell(7);
+        celda7.setCellValue("Informacion completa");
     }
     //Nombres de las columnas de la hoja de Autores Externos
     public void TitulosColExter(Sheet hoja){
@@ -424,6 +430,8 @@ public class Excel {
         celda3.setCellValue("Universidad");
         Cell celda4=fila1.createCell(4);
         celda4.setCellValue("País");
+        Cell celda5=fila1.createCell(5);
+        celda5.setCellValue("Informacion completa");
     }
     //Añade los botones de resolver conflictos (Estos botones son solo de decoracion ,no tienen funcionlidad, la accion de abrir la ventana
     //de resolver conflicto se hace por medio de un oyente del mouse jTable1MouseClicked dentro de la tabla de la clase Conflictos 
@@ -530,6 +538,10 @@ public class Excel {
             }
             //si esta dentro de la lista de paises 
             if(Paises.getPaises().contains(pais)){
+                //Si tiene traduccion en la lista de traduccion 
+                if(TraduccionPaises(pais)!=null){
+                    pais=TraduccionPaises(pais);
+                }
                 return pais;
             }    
         }
@@ -539,15 +551,24 @@ public class Excel {
             for (int j = 0; j < palab.length; j++) {
                 //si Todas las letras  son mayus
                 if(palab[j].equals(palab[j].toUpperCase())){
-                    for (int k = 0; k < Paises.getCodPaises().length; k++) {
-                        if(palab[j].matches(Paises.getCodPaises()[k])){
-                                return Paises.getCodPaises()[k];
+                    for (int k = 0; k < Paises.getCodPaises().size(); k++) {
+                        if(palab[j].matches(Paises.getCodPaises().get(k)[0])){
+                                return Paises.getCodPaises().get(k)[1];
                         }   
                     }
                 } 
             }
         }
         return "No encontrado"; 
+    }
+    //traducir paises
+    public String TraduccionPaises(String pais){
+        for (int i = 0; i < Paises.getTraducPaises().size(); i++) {
+            if(pais.equals(Paises.getTraducPaises().get(i)[0])){
+                return Paises.getTraducPaises().get(i)[1];
+            }  
+        }
+        return null;
     }
     //Busca el nombre de una universidad dentro de un arraylist de String
     public String BuscarU(String[] InfoLinea) {

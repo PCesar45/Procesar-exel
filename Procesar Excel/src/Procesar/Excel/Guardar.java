@@ -7,6 +7,8 @@ package Procesar.Excel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -42,16 +44,21 @@ public class Guardar {
                         i++;
                     }
                     cargando.dispose();
+                    File fileToSave = fileChooser.getSelectedFile();
+                    try {
+                        ex.GuardarExcel(fileToSave);
+                    } catch (IOException ex1) {
+                        Logger.getLogger(Guardar.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                    ExitoGuardar exito=new ExitoGuardar();
+                    exito.setVisible(true);
                }
             };
-            File fileToSave = fileChooser.getSelectedFile();
             
-            ex.GuardarExcel(fileToSave);
 
             Thread hilo=new Thread(runnable);
             hilo.start();    
-            ExitoGuardar exito=new ExitoGuardar();
-            exito.setVisible(true);
+            
         }
         else{
             //Para que no se salga por error sin guardar el archivo
