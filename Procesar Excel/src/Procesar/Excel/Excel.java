@@ -270,6 +270,7 @@ public class Excel {
         palabra=palabra.replaceAll("ú", "u");
         return palabra;
     }
+    //identifica el nombre de las columnas y l hoja donde esta 
     public int IdenNomDeCol_Y_numCol(Row fila) throws IOException{
         int numeroDeColumnas=0;
         for (int i = 0; i < fila.getLastCellNum(); i++){
@@ -615,7 +616,11 @@ public class Excel {
         for (int i = 0; i < InfoFila.length; i++) {
             //Si solo son siglas
              if(InfoFila[i].equals(InfoFila[i].toUpperCase())&&(!InfoFila[i].matches("(.*)[.]"))){
-                 return InfoFila[i];
+                 //Evita errores con la siglas
+                if("DOCINADE".equals(InfoFila[i])||"CIADEG-TEC".equals(InfoFila[i])||"CIB".equals(InfoFila[i])||"CIC".equals(InfoFila[i])||"CIF".equals(InfoFila[i])||"CIPA".equals(InfoFila[i])||"CIVCO".equals(InfoFila[i])
+                  ||"CEQIATEC".equals(InfoFila[i])||"CIDASTH".equals(InfoFila[i])||"CIEMTEC".equals(InfoFila[i])||"CIGA".equals(InfoFila[i])||"GASEL".equals(InfoFila[i])){
+                    return InfoFila[i];
+                }
              }
              //Convierte toda la info en minusculas 
              String InfoFilaMinus=InfoFila[i].toLowerCase();

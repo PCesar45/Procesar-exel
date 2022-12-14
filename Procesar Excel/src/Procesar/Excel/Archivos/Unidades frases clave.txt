@@ -1,5 +1,6 @@
 CIPA - CENTRO DE INVESTIGACIÓN EN PROTECCIÓN AMBIENTAL,proteccion ambiental,environmental protection,environm protect
 CIADEGTEC - CENTRO DE INVESTIGACIÓN EN ADMINISTRACIÓN, ECONOMÍA Y GESTIÓN TECNOLÓGICA,administración de empresas,administracion de empresas,adm empresas
+CIEMTEC - CENTRO DE INVESTIGACIÓN Y EXTENSIÓN EN MATERIALES,Centro de Investigación y Extensión en Materiales,Centro de Investigación y Extensión en Materiales,Centro de Investigacion y Extensión en Materiales,Centro de Investigacion y Extension en Materiales,Centro de Investigación y Extension en Materiales
 ATI - AREA DE ADMINISTRACION DE TECNOLOGIA DE INFORMACIÓN,tecnologia de informacion,tecnología de información,tecnologia de información,tecnología de informacion,information technology
 AU - ESCUELA ARQUITECTURA Y URBANISMO,arquitectura y urbanismo,architecture and urbanism,arquitectura & urbanismo,architecture & urbanism
 CD - ESCUELA DE CULTURA Y DEPORTE,cultura y deporte,culture and sport,cultura & deporte,culture and sport
@@ -20,6 +21,6 @@ PI - ESCUELA DE INGENIERIA EN PRODUCCION INDUSTRIAL,produccion industrial,produc
 QU - ESCUELA DE QUIMICA,ingenieria ambiental,ingeniería ambiental,environmental engineering,ingn ambiental
 SCC - ESCUELA DE CIENCIAS Y LETRAS,ciencias y letras,science and letters
 SHO - ESCUELA DE INGENIERIA EN SEGURIDAD LABORAL E HIGIENE AMBIENTAL,laboral e higiene,safety and environmental,laboral & higiene,safety & environmental
-VIE - VICERRECTORIA DE INVESTIGACION Y EXTENSION,investigacion y extension,investigación y extensión,investigacion y extensión,investigación y extension,research and extension,investigación & extension,research & extension,investigación & extensión,investigacion & extensión
+VIE - VICERRECTORIA DE INVESTIGACION Y EXTENSION,vicerrectoria de investigacion y extension,vicerrectoria de investigación y extensión,vicerrectoria de investigacion y extensión,vicerrectoria de investigación y extension,vice rectory of research and extension,vicerrectoria de investigación & extension,vice rectory of research & extension,vicerrectoria de investigación & extensión,vicerrectoria de investigacion & extensión
 DOCINADE,ciencias naturales,natural sciences
 GASEL,ambiental y seguridad,ambiental & seguridad,environmental and safety,environmental & safety,gest ambiental

@@ -34,7 +34,7 @@ public class Paises {
         String[] ArrCod=sc.next().split(";");
         for (int i = 0; i < ArrCod.length; i++) {
             String[] ArrCod2 = ArrCod[i].split(",");
-            System.out.println(Arrays.toString(ArrCod2));
+            //System.out.println(Arrays.toString(ArrCod2));
             codPaises.add(ArrCod2);
         }
         //------------------------
