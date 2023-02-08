@@ -27,7 +27,7 @@ import org.apache.poi.xssf.usermodel.*;
  * 
  */
 public class Excel {
-   
+    
     private static XSSFWorkbook book;
     
     private static XSSFWorkbook book2;
@@ -154,6 +154,11 @@ public class Excel {
                             if(doc==Documento.WoS){
                                 AutoresConAfi=DarFormato(AutoresConAfi);
                             }
+                            //evita errores
+                            AutoresConAfi=AutoresConAfi.replace(";;", "; ");
+                            AutoresConAfi=AutoresConAfi.replace("; ;", "; ");
+                            AutoresConAfi=AutoresConAfi.replace(",,", ", ");
+                            AutoresConAfi=AutoresConAfi.replace(", ,", ", ");
                             //Aqui se va a analizar y separar la columan de Autores con afiliacion
                             //s voy a separar la informacion por ; y lo guardo en un arraylist
                             String[] AutoresConAfiDiv1 = AutoresConAfi.split("; ");   
@@ -519,32 +524,37 @@ public class Excel {
             String pais=InfoLinea[i];
             //Copia para identificar siglas
             pais=pais.toLowerCase();
-            //asegurar que la primer letra del pais sea mayuscula
-            pais=pais.replaceFirst(String.valueOf(pais.charAt(0)),String.valueOf(pais.charAt(0)).toUpperCase());
+            
             //Quitar los espacios al final
             pais=pais.trim();
-            //Si el pais se conforma de mas palabras
-            if(pais.contains(" ")){
-                String[] separaciones=pais.split(" ");
-                pais="";
-                for (int j = 0; j < separaciones.length; j++) {
-                    if(!"".equals(separaciones[j])){
-                        String str =separaciones[j].replaceAll("\\)", "");
-                        String str2 =str.replaceAll("\\(", "");
-                        pais+=separaciones[j].replaceFirst(String.valueOf(str2.charAt(0)),String.valueOf(str2.charAt(0)).toUpperCase());
-                        if(j!=separaciones.length-1)
-                            pais+=" ";
+            if(!"".equals(pais)){
+                pais=pais.replaceAll("\\(", "");
+                pais=pais.replaceAll("\\)", "");
+                //asegurar que la primer letra del pais sea mayuscula
+                pais=pais.replaceFirst(String.valueOf(pais.charAt(0)),String.valueOf(pais.charAt(0)).toUpperCase());
+                //Si el pais se conforma de mas palabras
+                if(pais.contains(" ")){
+                    String[] separaciones=pais.split(" ");
+                    pais="";
+                    for (int j = 0; j < separaciones.length; j++) {
+                        if(!"".equals(separaciones[j])){
+                            String str =separaciones[j].replaceAll("\\)", "");
+                            String str2 =str.replaceAll("\\(", "");
+                            pais+=separaciones[j].replaceFirst(String.valueOf(str2.charAt(0)),String.valueOf(str2.charAt(0)).toUpperCase());
+                            if(j!=separaciones.length-1)
+                                pais+=" ";
+                        }
                     }
                 }
-            }
-            //si esta dentro de la lista de paises 
-            if(Paises.getPaises().contains(pais)){
-                //Si tiene traduccion en la lista de traduccion 
-                if(TraduccionPaises(pais)!=null){
-                    pais=TraduccionPaises(pais);
+                //si esta dentro de la lista de paises 
+                if(Paises.getPaises().contains(pais)){
+                    //Si tiene traduccion en la lista de traduccion 
+                    if(TraduccionPaises(pais)!=null){
+                        pais=TraduccionPaises(pais);
+                    }
+                    return pais;
                 }
-                return pais;
-            }    
+            }
         }
         //Si no lo encuentra por el nombre lo intenta encontrar por la abreviatutura del pais
         for (int i = 0; i < InfoLinea.length; i++) {
@@ -649,12 +659,14 @@ public class Excel {
             int Par1=InfoFila[i].indexOf("(");
             if(Par1!=-1){
                 int Par2=InfoFila[i].indexOf(")");
-                String siglas=InfoFila[i].substring(Par1+1, Par2);
-                //Este es muy especifico 
-                if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
-                   ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)||"GASEL".equals(siglas)){
-                    return siglas;
-                }  
+                if(Par2!=-1){
+                    String siglas=InfoFila[i].substring(Par1+1, Par2);
+                    //Este es muy especifico 
+                    if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
+                       ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)||"GASEL".equals(siglas)){
+                        return siglas;
+                    }
+                }
             }
             for (int j = 0; j < Info.length; j++) {
                 //Si no encuentra la Unidad de investigacion pone la escula
