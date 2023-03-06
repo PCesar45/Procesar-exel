@@ -46,6 +46,7 @@ public class Excel {
     private String Campus;
     private String Universidad;
     private String Pais;
+    private String TipoDeUnidad;
     private  ArrayList<String> AutoresWoS=new ArrayList<>();
     //Va a guardar la informacion de Authors with affiliations separada por comas
     //private String[] AuthorsWithAffDiv;
@@ -98,6 +99,7 @@ public class Excel {
         //para la informacion de la Universidad no identicada
         Cell celda5=hojaNoUni.getRow(0).createCell(5);
         celda5.setCellValue("Informacion Completa");
+        
         try {
             book=new XSSFWorkbook(new FileInputStream(ArchivoEntrada));
             ProcesarExcel(); 
@@ -203,6 +205,8 @@ public class Excel {
                                         String resultadoEscuela=buscaEscuela(AutoresConAfiDiv2);
                                         if(!"No encontrado".equals(resultadoEscuela)){
                                             Escuela=resultadoEscuela;
+                                            //Detecta el tipo de Unidad
+                                            TipoDeUnidad=buscaTipoUnidad(Escuela);
                                         }
                                         else{
                                             //Estos a excepciones
@@ -333,27 +337,44 @@ public class Excel {
         }
         Row filaNueva=hoja.createRow(fila);
         Cell celda00=filaNueva.createCell(0);
-        celda00.setCellValue(Codigo);
+        
+        if(doc==Documento.WoS){
+            celda00.setCellValue(Codigo);
+        }
+        if(doc==Documento.scopus){
+            celda00.setCellValue("SCOPUS:"+Codigo);
+        }
+       
         Cell celda01=filaNueva.createCell(1);
         celda01.setCellValue(Titulo);
         Cell celda02=filaNueva.createCell(2);
         celda02.setCellValue(Autor);
         Cell celda03=filaNueva.createCell(3);
-        celda03.setCellValue(Escuela);
+        celda03.setCellValue(TipoDeUnidad);
         Cell celda04=filaNueva.createCell(4);
-        celda04.setCellValue(Campus);
+        celda04.setCellValue(Escuela);
         Cell celda05=filaNueva.createCell(5);
-        celda05.setCellValue(Universidad);
+        celda05.setCellValue(Campus);
         Cell celda06=filaNueva.createCell(6);
-        celda06.setCellValue(Pais);
+        celda06.setCellValue(Universidad);
         Cell celda07=filaNueva.createCell(7);
-        celda07.setCellValue(infocompleta);
+        celda07.setCellValue(Pais);
+        Cell celda08=filaNueva.createCell(8);
+        celda08.setCellValue(infocompleta);
+        
     }
     //Guarda una nueva fila en la hoja de Autores Externos
     public void GuardarFilaAuExtern(Sheet hoja,int fila,String infocompleta){
         Row filaNueva=hoja.createRow(fila);
         Cell celda00=filaNueva.createCell(0);
-        celda00.setCellValue(Codigo);
+        if(doc==Documento.WoS){
+            celda00.setCellValue(Codigo);
+        }
+        if(doc==Documento.scopus){
+            celda00.setCellValue("SCOPUS:"+Codigo);
+        }
+        
+
         Cell celda01=filaNueva.createCell(1);
         celda01.setCellValue(Titulo);
         Cell celda02=filaNueva.createCell(2);
@@ -388,8 +409,13 @@ public class Excel {
     }
     //Añade filas a la tabla de conflictos
     public void añadirConflicto(Object[]ListaColumna,int Fila,String Tipo,String HojaExcel,String Info){
+        if(doc==Documento.WoS){
+           ListaColumna[0]=Codigo;
+        }
+        if(doc==Documento.scopus){
+            ListaColumna[0]="SCOPUS:"+Codigo;
+        }
         
-        ListaColumna[0]=Codigo;
         ListaColumna[1]=Fila;
         ListaColumna[2]=Tipo;
         ListaColumna[3]=HojaExcel;
@@ -412,16 +438,20 @@ public class Excel {
         celda1.setCellValue("Título");
         Cell celda2=fila1.createCell(2);
         celda2.setCellValue("Autor");
+        //tipo de unidad
         Cell celda3=fila1.createCell(3);
-        celda3.setCellValue("Unidad de investigación");
+        celda3.setCellValue("Tipo de Unidad");
         Cell celda4=fila1.createCell(4);
-        celda4.setCellValue("Campus");
+        celda4.setCellValue("Unidad de investigación");
         Cell celda5=fila1.createCell(5);
-        celda5.setCellValue("Universidad");
+        celda5.setCellValue("Campus");
         Cell celda6=fila1.createCell(6);
-        celda6.setCellValue("País");
+        celda6.setCellValue("Universidad");
         Cell celda7=fila1.createCell(7);
-        celda7.setCellValue("Informacion completa");
+        celda7.setCellValue("País");
+        Cell celda8=fila1.createCell(8);
+        celda8.setCellValue("Informacion completa");
+        
     }
     //Nombres de las columnas de la hoja de Autores Externos
     public void TitulosColExter(Sheet hoja){
@@ -454,6 +484,10 @@ public class Excel {
                 book2.write(fileout);
                 return true; 
                 
+        }catch(FileNotFoundException e){
+           JOptionPane.showMessageDialog(null, "Error al guardar archivo ,posiblemente tenga un archivo con el mismo nombre abierto en la carpeta donde va a guardar este archivo,cierrelo y vuelva a intentar","Error",JOptionPane.ERROR_MESSAGE);
+           System.exit(0);
+           return false;
         }
     }
     //Busca el autor en el formato en que viene  Scopus en toda la informacion
@@ -515,6 +549,9 @@ public class Excel {
             if((InfoLinea[i].matches("(.*)tech(.*)"))&&(InfoLinea[i].matches("(.*)costa rica(.*)"))){
                 return true;
             }
+            if(InfoLinea[i].matches("(.*)itcr(.*)")){
+                return true;
+            }
         }
         return false; 
     }
@@ -564,7 +601,7 @@ public class Excel {
                 if(palab[j].equals(palab[j].toUpperCase())){
                     for (int k = 0; k < Paises.getCodPaises().size(); k++) {
                         if(palab[j].matches(Paises.getCodPaises().get(k)[0])){
-                                return Paises.getCodPaises().get(k)[1];
+                                return String.valueOf(Paises.getCodPaises().get(k)[1]);
                         }   
                     }
                 } 
@@ -627,7 +664,7 @@ public class Excel {
             //Si solo son siglas
              if(InfoFila[i].equals(InfoFila[i].toUpperCase())&&(!InfoFila[i].matches("(.*)[.]"))){
                  //Evita errores con la siglas
-                if("DOCINADE".equals(InfoFila[i])||"CIADEG-TEC".equals(InfoFila[i])||"CIB".equals(InfoFila[i])||"CIC".equals(InfoFila[i])||"CIF".equals(InfoFila[i])||"CIPA".equals(InfoFila[i])||"CIVCO".equals(InfoFila[i])
+                if("CIADEG-TEC".equals(InfoFila[i])||"CIB".equals(InfoFila[i])||"CIC".equals(InfoFila[i])||"CIF".equals(InfoFila[i])||"CIPA".equals(InfoFila[i])||"CIVCO".equals(InfoFila[i])
                   ||"CEQIATEC".equals(InfoFila[i])||"CIDASTH".equals(InfoFila[i])||"CIEMTEC".equals(InfoFila[i])||"CIGA".equals(InfoFila[i])||"GASEL".equals(InfoFila[i])){
                     return InfoFila[i];
                 }
@@ -661,7 +698,11 @@ public class Excel {
                 int Par2=InfoFila[i].indexOf(")");
                 if(Par2!=-1){
                     String siglas=InfoFila[i].substring(Par1+1, Par2);
-                    //Este es muy especifico 
+                   
+                    if("DOCINADE".equals(siglas)){
+                        return "CND - AREA ACADEMICA DEL DOCTORADO EN CIENCIAS NATURALES PARA EL DESARROLLO";
+                    }
+                     //Este es muy especifico 
                     if("DOCINADE".equals(siglas)||"CIADEG-TEC".equals(siglas)||"CIB".equals(siglas)||"CIC".equals(siglas)||"CIF".equals(siglas)||"CIPA".equals(siglas)||"CIVCO".equals(siglas)
                        ||"CEQIATEC".equals(siglas)||"CIDASTH".equals(siglas)||"CIEMTEC".equals(siglas)||"CIGA".equals(siglas)||"GASEL".equals(siglas)){
                         return siglas;
@@ -680,6 +721,23 @@ public class Excel {
             }      
         }
         return "No encontrado"; 
+    }
+    //Busca el tipo de Unidad(Aun no va a la tabla de conflictos 
+    String buscaTipoUnidad(String Unidad){
+        String UnidadMinus=Unidad.toLowerCase();
+        if(UnidadMinus.matches("(.*)escuela(.*)")){
+            return "Escuela";
+        }
+        if(UnidadMinus.matches("(.*)centro(.*)")){
+            return "Centro I+E";
+        }
+        if(UnidadMinus.matches("(.*)area(.*)")){
+            return "Área académica";
+        }
+        if(UnidadMinus.matches("(.*)laboratorio(.*)")){
+            return "Otra";
+        }
+        return "No encontrado";    
     }
     //Busca el nombre de un campus dentro de un arraylist de String por el nombre de la provincia ,execepto San Carlos y Alajuela
     String buscaCampus( String[] InfoFila){

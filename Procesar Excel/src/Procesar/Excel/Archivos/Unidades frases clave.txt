@@ -22,5 +22,5 @@ QU - ESCUELA DE QUIMICA,ingenieria ambiental,ingeniería ambiental,environmental
 SCC - ESCUELA DE CIENCIAS Y LETRAS,ciencias y letras,science and letters
 SHO - ESCUELA DE INGENIERIA EN SEGURIDAD LABORAL E HIGIENE AMBIENTAL,laboral e higiene,safety and environmental,laboral & higiene,safety & environmental
 VIE - VICERRECTORIA DE INVESTIGACION Y EXTENSION,vicerrectoria de investigacion y extension,vicerrectoria de investigación y extensión,vicerrectoria de investigacion y extensión,vicerrectoria de investigación y extension,vice rectory of research and extension,vicerrectoria de investigación & extension,vice rectory of research & extension,vicerrectoria de investigación & extensión,vicerrectoria de investigacion & extensión
-DOCINADE,ciencias naturales,natural sciences
-GASEL,ambiental y seguridad,ambiental & seguridad,environmental and safety,environmental & safety,gest ambiental
+CND - AREA ACADEMICA DEL DOCTORADO EN CIENCIAS NATURALES PARA EL DESARROLLO,DOCINADE,ciencias naturales,natural sciences
+GASEL - UNIDAD INSTITUCIONAL DE GESTIÓN AMBIENTAL Y SEGURIDAD LABORAL,ambiental y seguridad,ambiental & seguridad,environmental and safety,environmental & safety,gest ambiental
